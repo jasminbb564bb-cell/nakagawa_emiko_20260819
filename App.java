@@ -16,8 +16,11 @@ public class App {
   private static final Map<String, Asset> ROUTES =
       Map.of(
           "/", new Asset("index.html", "text/html; charset=UTF-8"),
+          "/mock.html", new Asset("mock.html", "text/html; charset=UTF-8"),
           "/style.css", new Asset("style.css", "text/css; charset=UTF-8"),
-          "/app.js", new Asset("app.js", "application/javascript; charset=UTF-8"));
+          "/mock.css", new Asset("mock.css", "text/css; charset=UTF-8"),
+          "/app.js", new Asset("app.js", "application/javascript; charset=UTF-8"),
+          "/mock.js", new Asset("mock.js", "application/javascript; charset=UTF-8"));
 
   public static void main(String[] args) throws IOException {
     HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
@@ -25,7 +28,7 @@ public class App {
     server.setExecutor(Executors.newCachedThreadPool());
     server.start();
 
-    System.out.println("サーバー起動: http://localhost:8080");
+    System.out.println("\u30b5\u30fc\u30d0\u30fc\u8d77\u52d5: http://localhost:8080");
   }
 
   private static final class StaticFileHandler implements HttpHandler {

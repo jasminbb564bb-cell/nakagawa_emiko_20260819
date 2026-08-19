@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiet Todo</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <section id="hero-intro" class="hero-intro hero-intro-standalone"></section>
+
+      <header class="top-date" id="top-date"></header>
+
+      <main class="layout">
+        <section class="hero" aria-labelledby="hero-heading">
+          <p class="eyebrow" id="hero-heading">今すること</p>
+          <div id="focus-card" class="focus-card"></div>
+          <button id="later-toggle" class="subtle-link" type="button"></button>
+        </section>
+
+        <section class="panel input-panel" aria-labelledby="input-heading">
+          <p class="eyebrow" id="input-heading">入力</p>
+          <div id="input-guide" class="inline-guide"></div>
+          <label class="sr-only" for="quick-input">Todo入力</label>
+          <textarea
+            id="quick-input"
+            class="quiet-input"
+            rows="4"
+            placeholder="美容院 五時 8月22日"
+          ></textarea>
+          <div class="input-actions">
+            <button id="create-task" class="text-button" type="button">預ける</button>
+            <p class="subtle-status" id="input-status">思いついたまま入れて大丈夫です。</p>
+          </div>
+        </section>
+
+        <section class="panel choice-panel is-hidden" id="choice-panel" aria-labelledby="choice-heading">
+          <p class="eyebrow" id="choice-heading">どう扱いますか</p>
+          <div id="choice-card" class="choice-card"></div>
+        </section>
+
+        <section class="panel later-panel is-hidden" id="later-panel" aria-labelledby="later-heading">
+          <p class="eyebrow" id="later-heading">あとで見るもの</p>
+          <div id="later-list" class="later-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="focus-template">
+      <article class="task-card">
+        <p class="task-kicker"></p>
+        <div class="task-time"></div>
+        <h1 class="task-title"></h1>
+        <p class="task-copy"></p>
+        <p class="inline-guide is-soft is-hidden"></p>
+        <div class="task-actions"></div>
+      </article>
+    </template>
+
+    <template id="choice-template">
+      <article class="choice-item">
+        <p class="task-kicker">新しく預かったこと</p>
+        <h2 class="choice-title"></h2>
+        <p class="task-copy"></p>
+        <div class="inline-guide is-soft is-hidden" id="choice-guide"></div>
+        <div class="task-actions">
+          <button class="text-button" data-choice="now" type="button">今</button>
+          <button class="text-button" data-choice="later" type="button">あとで</button>
+          <button class="text-button" data-choice="soon" type="button">1分後に再表示</button>
+        </div>
+      </article>
+    </template>
+
+    <template id="later-item-template">
+      <article class="later-item">
+        <div>
+          <p class="task-kicker"></p>
+          <h2 class="later-title"></h2>
+          <p class="record-meta"></p>
+        </div>
+        <button class="text-button" data-action="show-now" type="button">今見る</button>
+      </article>
+    </template>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

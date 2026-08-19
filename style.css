@@ -1,0 +1,267 @@
+:root {
+  --bg: #f5f1e9;
+  --panel: rgba(255, 252, 246, 0.86);
+  --panel-strong: rgba(255, 252, 246, 0.96);
+  --text: #1f1a17;
+  --muted: #70675f;
+  --line: rgba(31, 26, 23, 0.08);
+  --line-strong: rgba(31, 26, 23, 0.16);
+  --danger: #8f5648;
+  --radius: 28px;
+  --content-width: 760px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.72), transparent 40%),
+    linear-gradient(180deg, #f8f4ec 0%, #f2ede5 100%);
+  color: var(--text);
+}
+
+body {
+  display: flex;
+  justify-content: center;
+}
+
+.app-shell {
+  width: min(100%, 980px);
+  padding: 28px 20px 72px;
+}
+
+.hero-intro-standalone {
+  width: min(100%, 520px);
+  margin: 18px auto 72px;
+  justify-self: start;
+}
+
+.top-date {
+  width: min(100%, var(--content-width));
+  margin: 0 auto 44px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+}
+
+.layout {
+  width: min(100%, var(--content-width));
+  margin: 0 auto;
+  display: grid;
+  gap: 28px;
+}
+
+.hero,
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
+}
+
+.hero {
+  padding: 36px 30px 28px;
+  min-height: 420px;
+  display: grid;
+  align-content: start;
+  gap: 24px;
+}
+
+.panel {
+  padding: 26px 24px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
+}
+
+.hero-intro {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+}
+
+.hero-intro p {
+  margin: 0;
+}
+
+.hero-intro-main {
+  font-size: clamp(1.05rem, 2.3vw, 1.28rem);
+  line-height: 1.8;
+}
+
+.hero-intro-sub {
+  color: var(--muted);
+  line-height: 1.9;
+  max-width: 30ch;
+}
+
+.hero-intro-emphasis {
+  display: inline-block;
+  color: rgba(31, 26, 23, 0.88);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.focus-card,
+.choice-card,
+.later-list {
+  display: grid;
+  gap: 16px;
+}
+
+.task-card,
+.choice-item,
+.later-item {
+  display: grid;
+  gap: 14px;
+}
+
+.task-kicker,
+.record-meta,
+.subtle-status,
+.inline-guide,
+.subtle-link {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.task-time {
+  font-size: clamp(2.1rem, 7vw, 3.7rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.task-title,
+.choice-title,
+.later-title {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.22;
+}
+
+.task-title {
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+}
+
+.choice-title,
+.later-title {
+  font-size: 1.2rem;
+}
+
+.task-copy {
+  margin: 0;
+  line-height: 1.85;
+  color: var(--text);
+}
+
+.inline-guide {
+  font-size: 0.95rem;
+}
+
+.inline-guide.is-soft {
+  color: var(--muted);
+}
+
+.task-actions,
+.input-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.text-button,
+.subtle-link {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--panel-strong);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 11px 18px;
+  font: inherit;
+}
+
+.text-button:hover,
+.subtle-link:hover {
+  border-color: var(--line-strong);
+}
+
+.subtle-link {
+  justify-self: start;
+  padding-inline: 0;
+  border: none;
+  background: transparent;
+}
+
+.quiet-input {
+  width: 100%;
+  min-height: 128px;
+  resize: vertical;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 1.06rem;
+  line-height: 1.95;
+  outline: none;
+}
+
+.quiet-input::placeholder {
+  color: rgba(112, 103, 95, 0.85);
+}
+
+.later-item + .later-item {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.is-hidden {
+  display: none;
+}
+
+.is-danger {
+  color: var(--danger);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding-inline: 14px;
+  }
+
+  .hero-intro-standalone {
+    margin: 12px auto 56px;
+    width: min(100%, 420px);
+  }
+
+  .hero {
+    min-height: 360px;
+    padding: 28px 22px 24px;
+  }
+
+  .panel {
+    padding: 22px 18px;
+  }
+}

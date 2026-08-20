@@ -57,6 +57,7 @@ const translations = {
     dateUnconfirmedSupport: "日付がまだ確定していません",
     needInfoSupport: "時間や期限を後で確認します",
     doneAction: "終える",
+    doneActionNote: "END",
     rescheduleAction: "あらためる",
     changeTimeAction: "時間を変える",
     makeSchedule: "予定にする",
@@ -110,6 +111,7 @@ const translations = {
     dateUnconfirmedSupport: "The date has not been confirmed yet.",
     needInfoSupport: "We need time or due date later.",
     doneAction: "Done",
+    doneActionNote: "END",
     rescheduleAction: "Reschedule",
     changeTimeAction: "Change time",
     makeSchedule: "Make it an event",
@@ -736,16 +738,20 @@ function renderFocusCardInto(container, template, item, variant) {
       sign.setAttribute("aria-hidden", "true");
       sign.innerHTML = `
         <svg viewBox="0 0 16 16" class="focus-action-sign-icon">
-          <path d="M3.8 10.9H12.2"></path>
-          <path d="M5 10.9V12.4H11V10.9"></path>
-          <path d="M8 4.1V8.6"></path>
-          <path d="M6.8 7.5L8 8.8L9.2 7.5"></path>
+          <path d="M4.1 11.2H11.9"></path>
+          <path d="M8 4.4V9.6"></path>
         </svg>
       `;
+      const textWrap = document.createElement("span");
+      textWrap.className = "focus-action-text";
       const label = document.createElement("span");
       label.className = "focus-action-label";
       label.textContent = action.label;
-      button.append(sign, label);
+      const note = document.createElement("span");
+      note.className = "focus-action-note";
+      note.textContent = t("doneActionNote");
+      textWrap.append(label, note);
+      button.append(sign, textWrap);
     } else {
       button.textContent = action.label;
     }

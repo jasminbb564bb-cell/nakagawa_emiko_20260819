@@ -397,6 +397,7 @@ function enrichItemFromRaw(rawText, fallbackKind, createdAt) {
     prompt: buildPromptMeta(),
     workStage: "unstarted",
     previousScheduledAt: null,
+    nextCheckAt: null,
     ambiguity: parsed.ambiguity,
   };
 }
@@ -483,6 +484,8 @@ function parseActionToken(tokens) {
 }
 
 function inferKind(fallbackKind, rawText, actionInfo, timeInfo, dayInfo, tokens) {
+  if (timeInfo.token && dayInfo.certainty === "exact") return "schedule";
+  if (timeInfo.token) return "schedule";
   if (fallbackKind === "memo") return inferKindFromLearning(tokens) || "memo";
   if (timeInfo.token || rawText.includes("予約")) return "schedule";
   if (dayInfo.token || actionInfo.token === "提出" || fallbackKind === "todo") return "todo";
@@ -872,13 +875,16 @@ function displayPrimaryTime(item) {
   if (item.state === STATES.DATE_UNCONFIRMED) return t("dateUnconfirmedLabel");
   if (item.state === STATES.NEED_INFO) return t("needsInfoLabel");
   if (item.scheduledAt) return formatScheduledDisplay(item.scheduledAt);
-  if (item.deadlineAt) return formatScheduledDisplay(item.deadlineAt);
-  if (item.nextActionAt) return formatScheduledDisplay(item.nextActionAt);
+  if (item.kind === "todo" && item.deadlineAt) return formatScheduledDisplay(item.deadlineAt);
   return t("nowLabel");
 }
 
 function displaySupport(item) {
-  if (item.state === STATES.PAST_UNCONFIRMED) return item.support || item.rawText;
+  if (item.state === STATES.PAST_UNCONFIRMED) {
+    const originalTime = item.scheduledAt ? formatTimeOnly(item.scheduledAt) : item.deadlineAt ? formatTimeOnly(item.deadlineAt) : "";
+    const pastLine = state.ui.language === "ja" ? "予定時刻を過ぎています" : "The scheduled time has passed.";
+    return [originalTime ? `${originalTime} ${item.title}` : "", pastLine, item.support || ""].filter(Boolean).join("\n");
+  }
   if (item.state === STATES.INBOX) return item.support || item.rawText;
   if (item.state === STATES.DATE_UNCONFIRMED) return t("dateUnconfirmedSupport");
   if (item.support) return item.support;
@@ -980,6 +986,7 @@ function beginReschedule(itemId) {
   const item = findItem(itemId);
   if (!item) return;
   item.prompt.dismissCount += 1;
+  item.nextCheckAt = null;
   if (window.QuietNotificationHistory) {
     window.QuietNotificationHistory.markAction(state, itemId, "reschedule", getCurrentNow().toISOString());
     refreshBehaviorProfile();
@@ -1042,6 +1049,9 @@ function playCompletionAnimation(targetNode, onComplete) {
 function markPrompted(item) {
   if (!shouldPromptItem(item)) return;
   item.prompt.lastPromptedAt = getCurrentNow().toISOString();
+  if (item.state === STATES.PAST_UNCONFIRMED) {
+    item.nextCheckAt = toTokyoIso(new Date(getCurrentNow().getTime() + 6 * 60 * 60 * 1000));
+  }
   persist();
 }
 
@@ -1104,6 +1114,11 @@ function formatScheduledDisplay(value) {
   const locale = state.ui.language === "ja" ? "ja-JP" : "en-US";
   const weekday = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: TOKYO_TIME_ZONE }).format(date);
   return `${pad(date.getMonth() + 1)}.${pad(date.getDate())} ${weekday}\n${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function formatTimeOnly(value) {
+  const date = new Date(value);
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 function formatMonthDay(date) {

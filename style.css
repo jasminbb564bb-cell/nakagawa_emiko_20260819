@@ -155,6 +155,12 @@ textarea {
 
 .home-variant-switch {
   display: flex;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  z-index: 20;
+  flex-shrink: 0;
 }
 
 .app-shell[data-home-variant="B"] .home-variant-switch {

@@ -862,7 +862,7 @@ function renderFocusCardInto(container, template, item, variant) {
 function buildFocusTitle(item) {
   if (item.state === STATES.PAST_UNCONFIRMED) return `${item.title}\n${t("pastQuestion")}`;
   if (item.state === STATES.DATE_UNCONFIRMED) return `${item.title}\n${t("dateQuestion", { weekday: formatWeekdayName(item.ambiguity && item.ambiguity.weekday) })}`;
-  if (item.state === STATES.INBOX) return `${item.title}\n${t("inboxQuestion")}`;
+  if (item.state === STATES.INBOX) return item.title;
   return item.title;
 }
 
@@ -1095,7 +1095,9 @@ function displaySupport(item) {
     const pastLine = state.ui.language === "ja" ? "予定時刻を過ぎています" : "The scheduled time has passed.";
     return [pastLine, localizeGeneratedText(item.support || "")].filter(Boolean).join("\n");
   }
-  if (item.state === STATES.INBOX) return item.support || item.rawText;
+  if (item.state === STATES.INBOX) {
+    return [localizeGeneratedText(item.support || ""), t("inboxQuestion")].filter(Boolean).join("\n");
+  }
   if (item.state === STATES.DATE_UNCONFIRMED) return t("dateUnconfirmedSupport");
   if (item.support) return localizeGeneratedText(item.support);
   if (item.state === STATES.NEED_INFO) return t("needInfoSupport");
@@ -1106,6 +1108,12 @@ function localizeGeneratedText(text) {
   if (!text || state.ui.language === "ja") return text;
 
   return text
+    .replace(/展示/g, "Exhibition")
+    .replace(/予約/g, "Reservation")
+    .replace(/準備/g, "Preparation")
+    .replace(/提出/g, "Submission")
+    .replace(/買い物/g, "Shopping")
+    .replace(/確認/g, "Check")
     .replace(/本日|今日|きょう/g, "Today")
     .replace(/明日|あした/g, "Tomorrow")
     .replace(/明後日|あさって/g, "Day after tomorrow")

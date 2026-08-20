@@ -89,12 +89,27 @@
         <section class="all-stage">
           <div class="all-stage-head">
             <p class="section-mark" id="all-heading" data-i18n="viewAll">&#12377;&#12409;&#12390;&#12434;&#35211;&#12427;</p>
-            <div class="sort-switch" id="sort-switch" aria-label="&#20006;&#12403;&#26367;&#12360;">
-              <button class="sort-button" type="button" data-sort="priority" data-i18n="sortPriority">&#20778;&#20808;&#38918;</button>
-              <button class="sort-button" type="button" data-sort="time" data-i18n="sortTime">&#26178;&#38291;&#38918;</button>
+            <div class="all-stage-tools">
+              <div class="sort-switch" id="sort-switch" aria-label="&#20006;&#12403;&#26367;&#12360;">
+                <button class="sort-button" type="button" data-sort="priority" data-i18n="sortPriority">&#20778;&#20808;&#38918;</button>
+                <button class="sort-button" type="button" data-sort="time" data-i18n="sortTime">&#26178;&#38291;&#38918;</button>
+              </div>
+              <button id="open-archive-view" class="subtle-link" type="button" data-i18n="archiveView">&#32066;&#12360;&#12383;&#12418;&#12398;</button>
             </div>
           </div>
           <div id="all-list" class="all-list"></div>
+        </section>
+      </section>
+
+      <section id="archive-view" class="view-section is-hidden" aria-labelledby="archive-heading">
+        <div class="view-head">
+          <button id="back-from-archive" class="subtle-link" type="button" data-i18n="back">&#25147;&#12427;</button>
+        </div>
+        <section class="all-stage">
+          <div class="all-stage-head">
+            <p class="section-mark" id="archive-heading" data-i18n="archiveView">&#32066;&#12360;&#12383;&#12418;&#12398;</p>
+          </div>
+          <div id="archive-list" class="all-list"></div>
         </section>
       </section>
 
@@ -233,6 +248,15 @@
       <h2 class="all-title"></h2>
       <p class="all-support"></p>
       <button class="all-edit-link" type="button" data-i18n="rewrite">&#26360;&#12365;&#30452;&#12377;</button>
+    </article>
+  </template>
+
+  <template id="archive-item-template">
+    <article class="all-item archive-item">
+      <p class="archive-time all-time"></p>
+      <h2 class="archive-title all-title"></h2>
+      <p class="archive-ended-at all-support"></p>
+      <button class="archive-restore-link all-edit-link" type="button" data-i18n="restoreAction">&#25147;&#12377;</button>
     </article>
   </template>
 

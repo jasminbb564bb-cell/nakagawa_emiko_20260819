@@ -9,6 +9,7 @@ const STATES = {
   ACTION_NOW: "ACTION_NOW",
   PAST_UNCONFIRMED: "PAST_UNCONFIRMED",
   DONE: "DONE",
+  ARCHIVED: "ARCHIVED",
 };
 
 const translations = {
@@ -24,8 +25,12 @@ const translations = {
     navNextLower: "next",
     back: "戻る",
     viewAll: "すべてを見る",
+    archiveView: "終えたもの",
     sortPriority: "優先順",
     sortTime: "時間順",
+    restoreAction: "戻す",
+    archivedAtLabel: "終えた日時",
+    originalTimeLabel: "元の日時",
     newSchedule: "新しい予定",
     addTodo: "やることを追加",
     memo: "メモ",
@@ -80,8 +85,12 @@ const translations = {
     navNextLower: "next",
     back: "Back",
     viewAll: "View all",
+    archiveView: "Archived",
     sortPriority: "Priority",
     sortTime: "Timeline",
+    restoreAction: "Restore",
+    archivedAtLabel: "Archived",
+    originalTimeLabel: "Original time",
     newSchedule: "New event",
     addTodo: "Add task",
     memo: "Note",
@@ -139,6 +148,7 @@ const bodyRoot = document.body;
 const topDate = document.querySelector("#top-date");
 const homeView = document.querySelector("#home-view");
 const allView = document.querySelector("#all-view");
+const archiveView = document.querySelector("#archive-view");
 const scheduleView = document.querySelector("#schedule-view");
 const todoView = document.querySelector("#todo-view");
 const memoView = document.querySelector("#memo-view");
@@ -150,6 +160,7 @@ const focusCardB = document.querySelector("#focus-card-b");
 const nextCardA = document.querySelector("#next-card-a");
 const nextCardB = document.querySelector("#next-card-b");
 const allList = document.querySelector("#all-list");
+const archiveList = document.querySelector("#archive-list");
 const fabWrap = document.querySelector(".fab-wrap");
 const fabButton = document.querySelector("#fab-button");
 const fabMenu = document.querySelector("#fab-menu");
@@ -175,6 +186,7 @@ const focusTemplateA = document.querySelector("#focus-template-a");
 const focusTemplateB = document.querySelector("#focus-template-b");
 const nextTemplate = document.querySelector("#next-template");
 const allItemTemplate = document.querySelector("#all-item-template");
+const archiveItemTemplate = document.querySelector("#archive-item-template");
 
 const state = loadState();
 
@@ -228,6 +240,7 @@ function loadState() {
         editStatus: "",
         editingItemId: null,
         pendingDoneItemId: null,
+        archiveSortMode: "ended",
         ...parsed.ui,
       };
       return parsed;
@@ -252,6 +265,7 @@ function loadState() {
       editStatus: "",
       editingItemId: null,
       pendingDoneItemId: null,
+      archiveSortMode: "ended",
     },
   };
 }
@@ -263,6 +277,13 @@ function persist() {
 
 function normalizeStoredItem(item) {
   if (!item || !item.rawText) return item;
+  if (item.state === STATES.DONE && item.completedAt && !item.archivedAt) {
+    return {
+      ...item,
+      state: STATES.ARCHIVED,
+      archivedAt: item.completedAt,
+    };
+  }
   const parsedAsSchedule = parseRawText(item.rawText, "schedule");
   const hasExactSchedule = Boolean(parsedAsSchedule.scheduledAt);
   const looksLikeBuggyTodo = item.kind === "todo" && !item.scheduledAt && Boolean(item.deadlineAt) && hasExactSchedule;
@@ -343,6 +364,8 @@ function bindEvents() {
   });
 
   document.querySelector("#back-from-all").addEventListener("click", () => openView("home"));
+  document.querySelector("#open-archive-view").addEventListener("click", () => openView("archive"));
+  document.querySelector("#back-from-archive").addEventListener("click", () => openView("all"));
   document.querySelector("#back-from-schedule").addEventListener("click", () => openView("home"));
   document.querySelector("#back-from-todo").addEventListener("click", () => openView("home"));
   document.querySelector("#back-from-memo").addEventListener("click", () => openView("home"));
@@ -666,6 +689,7 @@ function render() {
   renderStatuses();
   renderSortButtons();
   renderAllList();
+  renderArchiveList();
 }
 
 function applyStaticTranslations() {
@@ -692,6 +716,7 @@ function renderViews() {
   const active = state.ui.activeView;
   homeView.classList.toggle("is-hidden", active !== "home");
   allView.classList.toggle("is-hidden", active !== "all");
+  archiveView.classList.toggle("is-hidden", active !== "archive");
   scheduleView.classList.toggle("is-hidden", active !== "schedule");
   todoView.classList.toggle("is-hidden", active !== "todo");
   memoView.classList.toggle("is-hidden", active !== "memo");
@@ -734,6 +759,7 @@ function refreshBehaviorProfile() {
 }
 
 function deriveState(item, now) {
+  if (item.archivedAt) return STATES.ARCHIVED;
   if (item.completedAt) return STATES.DONE;
   if (item.kind === "memo" || item.kind === "unknown") return STATES.INBOX;
   if (item.ambiguity || (item.kind === "schedule" && !item.scheduledAt)) return STATES.DATE_UNCONFIRMED;
@@ -922,6 +948,30 @@ function renderAllList() {
   });
 }
 
+function renderArchiveList() {
+  archiveList.innerHTML = "";
+  if (state.ui.activeView !== "archive") return;
+  const items = getArchivedItemsSorted();
+  if (items.length === 0) {
+    archiveList.innerHTML = `<p class="all-empty">${t("allEmpty")}</p>`;
+    return;
+  }
+  items.forEach((item) => {
+    const fragment = archiveItemTemplate.content.cloneNode(true);
+    fragment.querySelector(".archive-time").textContent = item.scheduledAt
+      ? formatScheduledDisplay(item.scheduledAt)
+      : item.deadlineAt
+        ? formatScheduledDisplay(item.deadlineAt)
+        : t("nowLabel");
+    fragment.querySelector(".archive-title").textContent = item.title;
+    fragment.querySelector(".archive-ended-at").textContent = `${t("archivedAtLabel")}\n${formatScheduledDisplay(item.archivedAt || item.completedAt)}`;
+    const restoreButton = fragment.querySelector(".archive-restore-link");
+    restoreButton.textContent = t("restoreAction");
+    restoreButton.addEventListener("click", () => restoreArchivedItem(item.id));
+    archiveList.appendChild(fragment);
+  });
+}
+
 function getFocusItem() {
   if (window.QuietNotificationSelector) {
     return window.QuietNotificationSelector.pickFocusItem(
@@ -930,7 +980,7 @@ function getFocusItem() {
       state.userBehaviorProfile
     );
   }
-  return state.items.filter((item) => item.state !== STATES.DONE).sort(compareByPriority)[0] || null;
+  return state.items.filter((item) => item.state !== STATES.DONE && item.state !== STATES.ARCHIVED).sort(compareByPriority)[0] || null;
 }
 
 function getNextScheduleItem() {
@@ -941,8 +991,15 @@ function getNextScheduleItem() {
 }
 
 function getAllItemsSorted() {
-  const items = state.items.slice().filter((item) => item.state !== STATES.DONE);
+  const items = state.items.slice().filter((item) => item.state !== STATES.DONE && item.state !== STATES.ARCHIVED);
   return state.ui.sortMode === "time" ? items.sort(compareByTime) : items.sort(compareByPriority);
+}
+
+function getArchivedItemsSorted() {
+  return state.items
+    .slice()
+    .filter((item) => item.state === STATES.ARCHIVED)
+    .sort((left, right) => new Date(right.archivedAt || right.completedAt).getTime() - new Date(left.archivedAt || left.completedAt).getTime());
 }
 
 function compareByPriority(left, right) {
@@ -1165,12 +1222,23 @@ function cancelCompleteAction() {
 function markDone(itemId) {
   const item = findItem(itemId);
   if (!item) return;
-  item.state = STATES.DONE;
+  item.state = STATES.ARCHIVED;
   item.completedAt = getCurrentNow().toISOString();
+  item.archivedAt = item.completedAt;
   if (window.QuietNotificationHistory) {
     window.QuietNotificationHistory.markAction(state, itemId, "done", item.completedAt);
     refreshBehaviorProfile();
   }
+  persist();
+  render();
+}
+
+function restoreArchivedItem(itemId) {
+  const item = findItem(itemId);
+  if (!item) return;
+  item.archivedAt = null;
+  item.completedAt = null;
+  item.state = deriveState(item, getCurrentNow().getTime());
   persist();
   render();
 }

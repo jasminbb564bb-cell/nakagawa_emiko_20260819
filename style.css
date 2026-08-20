@@ -783,9 +783,19 @@ textarea {
   margin-bottom: 30px;
 }
 
+.all-stage-tools {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
 .app-shell[data-home-variant="B"] .all-stage-head {
   margin-bottom: 84px;
   align-items: baseline;
+}
+
+.app-shell[data-home-variant="B"] .all-stage-tools {
+  gap: 28px;
 }
 
 .app-shell[data-home-variant="B"] .sort-switch {
@@ -886,6 +896,10 @@ textarea {
   line-height: 2.1;
   letter-spacing: 0.18em;
   color: #111111;
+}
+
+.archive-item .archive-ended-at {
+  white-space: pre-line;
 }
 
 .app-shell[data-home-variant="B"] .all-item::before {

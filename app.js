@@ -120,6 +120,13 @@ const translations = {
   },
 };
 
+const SUPPORT_SCRIPTS = [
+  "./notification-history.js",
+  "./behavior-analytics.js",
+  "./learning-profile.js",
+  "./notification-selector.js",
+];
+
 const appShell = document.querySelector(".app-shell");
 const htmlRoot = document.documentElement;
 const bodyRoot = document.body;
@@ -165,9 +172,29 @@ const allItemTemplate = document.querySelector("#all-item-template");
 
 const state = loadState();
 
-boot();
+loadSupportScripts()
+  .then(() => boot())
+  .catch(() => boot());
+
+function loadSupportScripts() {
+  return Promise.all(
+    SUPPORT_SCRIPTS.map((src) => {
+      if (document.querySelector(`script[data-support-script="${src}"]`)) return Promise.resolve();
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = false;
+        script.dataset.supportScript = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    })
+  );
+}
 
 function boot() {
+  ensureLearningState();
   seedIfEmpty();
   syncVariantFromLocation();
   syncCompletionModeFromLocation();
@@ -221,7 +248,14 @@ function loadState() {
 }
 
 function persist() {
+  ensureLearningState();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function ensureLearningState() {
+  if (window.QuietNotificationHistory) window.QuietNotificationHistory.ensureState(state);
+  if (window.QuietLearningProfile) window.QuietLearningProfile.ensureState(state);
+  if (!state.notificationHistory) state.notificationHistory = [];
 }
 
 function t(key, vars = {}) {
@@ -587,7 +621,12 @@ function refreshDynamicState() {
   state.items.forEach((item) => {
     item.state = deriveState(item, now);
   });
+  refreshBehaviorProfile();
   persist();
+}
+
+function refreshBehaviorProfile() {
+  if (window.QuietLearningProfile) window.QuietLearningProfile.refresh(state);
 }
 
 function deriveState(item, now) {
@@ -607,8 +646,19 @@ function deriveState(item, now) {
 
 function renderFocusCards() {
   const focusItem = getFocusItem();
+  rememberFocusPresentation(focusItem);
   renderFocusCardInto(focusCardA, focusTemplateA, focusItem, "A");
   renderFocusCardInto(focusCardB, focusTemplateB, focusItem, "B");
+}
+
+function rememberFocusPresentation(item) {
+  if (!item || !window.QuietNotificationHistory) return;
+  window.QuietNotificationHistory.recordPresentation(state, item, {
+    channel: "home",
+    messageText: buildFocusTitle(item),
+    shownAt: getCurrentNow().toISOString(),
+  });
+  refreshBehaviorProfile();
 }
 
 function renderFocusCardInto(container, template, item, variant) {
@@ -736,6 +786,13 @@ function renderAllList() {
 }
 
 function getFocusItem() {
+  if (window.QuietNotificationSelector) {
+    return window.QuietNotificationSelector.pickFocusItem(
+      state.items,
+      getCurrentNow().getTime(),
+      state.userBehaviorProfile
+    );
+  }
   return state.items.filter((item) => item.state !== STATES.DONE).sort(compareByPriority)[0] || null;
 }
 
@@ -752,6 +809,14 @@ function getAllItemsSorted() {
 }
 
 function compareByPriority(left, right) {
+  if (window.QuietNotificationSelector) {
+    return window.QuietNotificationSelector.compareByPriority(
+      left,
+      right,
+      getCurrentNow().getTime(),
+      state.userBehaviorProfile
+    );
+  }
   const diff = calculatePriorityScore(right) - calculatePriorityScore(left);
   return diff !== 0 ? diff : compareByTime(left, right);
 }
@@ -764,6 +829,13 @@ function compareByTime(left, right) {
 }
 
 function calculatePriorityScore(item) {
+  if (window.QuietNotificationSelector) {
+    return window.QuietNotificationSelector.computeItemScore(
+      item,
+      getCurrentNow().getTime(),
+      state.userBehaviorProfile
+    );
+  }
   const weights = {
     [STATES.PAST_UNCONFIRMED]: 600,
     [STATES.ACTION_NOW]: 500,
@@ -837,11 +909,20 @@ function dismissInboxItem(itemId) {
   if (!item) return;
   item.prompt.dismissCount += 1;
   item.prompt.lastPromptedAt = getCurrentNow().toISOString();
+  if (window.QuietNotificationHistory) {
+    window.QuietNotificationHistory.markAction(state, itemId, "dismiss", getCurrentNow().toISOString());
+    refreshBehaviorProfile();
+  }
   persist();
   render();
 }
 
 function recordClassificationLearning(item, selectedKind) {
+  if (window.QuietLearningProfile) {
+    window.QuietLearningProfile.recordClassificationCorrection(state, item, selectedKind);
+    refreshBehaviorProfile();
+    return;
+  }
   item.tokens.filter((token) => token && token.length >= 2).forEach((term) => {
     const current = state.userLearning.termKinds[term] || { schedule: 0, todo: 0, memo: 0 };
     current[selectedKind] = (current[selectedKind] || 0) + 1;
@@ -872,6 +953,7 @@ function confirmDateChoice(itemId, date) {
   item.prepStartAt = buildPrepStartAt(item.kind, item.scheduledAt, item.deadlineAt);
   item.nextActionAt = buildNextActionAt(item.kind, item.scheduledAt, item.deadlineAt, item.prepStartAt);
   item.state = deriveState(item, getCurrentNow().getTime());
+  item.reactionScore += 6;
   persist();
   render();
 }
@@ -885,6 +967,10 @@ function sendToNeedInfo(itemId) {
   item.prepStartAt = null;
   item.nextActionAt = null;
   item.prompt.dismissCount += 1;
+  if (window.QuietNotificationHistory) {
+    window.QuietNotificationHistory.markAction(state, itemId, "reschedule", getCurrentNow().toISOString());
+    refreshBehaviorProfile();
+  }
   persist();
   render();
 }
@@ -894,6 +980,10 @@ function beginReschedule(itemId) {
   const item = findItem(itemId);
   if (!item) return;
   item.prompt.dismissCount += 1;
+  if (window.QuietNotificationHistory) {
+    window.QuietNotificationHistory.markAction(state, itemId, "reschedule", getCurrentNow().toISOString());
+    refreshBehaviorProfile();
+  }
   persist();
 }
 
@@ -920,6 +1010,10 @@ function markDone(itemId) {
   if (!item) return;
   item.state = STATES.DONE;
   item.completedAt = getCurrentNow().toISOString();
+  if (window.QuietNotificationHistory) {
+    window.QuietNotificationHistory.markAction(state, itemId, "done", item.completedAt);
+    refreshBehaviorProfile();
+  }
   persist();
   render();
 }

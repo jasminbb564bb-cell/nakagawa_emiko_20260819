@@ -520,6 +520,49 @@ function parseDateToken(tokens) {
     return { token: explicitDate, date: new Date(now.getFullYear(), month - 1, day), certainty: "exact", ambiguity: null };
   }
 
+  const exactTodayToken = tokens.find((value) => ["今日", "本日", "きょう"].includes(value));
+  if (exactTodayToken) return { token: exactTodayToken, date: stripTime(now), certainty: "exact", ambiguity: null };
+
+  const exactTomorrowToken = tokens.find((value) => ["明日", "あした"].includes(value));
+  if (exactTomorrowToken) {
+    const date = stripTime(now);
+    date.setDate(date.getDate() + 1);
+    return { token: exactTomorrowToken, date, certainty: "exact", ambiguity: null };
+  }
+
+  const exactDayAfterTomorrowToken = tokens.find((value) => ["明後日", "あさって"].includes(value));
+  if (exactDayAfterTomorrowToken) {
+    const date = stripTime(now);
+    date.setDate(date.getDate() + 2);
+    return { token: exactDayAfterTomorrowToken, date, certainty: "exact", ambiguity: null };
+  }
+
+  const qualifiedWeekToken = tokens.find((value) => /^(今週|来週).+(?:曜|曜日)$/.test(value));
+  if (qualifiedWeekToken) {
+    const weekday = inferWeekdayFromToken(qualifiedWeekToken.replace(/^(今週|来週)/, ""));
+    return {
+      token: qualifiedWeekToken,
+      date: buildRelativeWeekdayDate(weekday, qualifiedWeekToken.startsWith("来週") ? "next" : "this"),
+      certainty: "exact",
+      ambiguity: null,
+    };
+  }
+
+  const weekdayToken = tokens.find((value) =>
+    [
+      "日", "日曜", "日曜日",
+      "月", "月曜", "月曜日",
+      "火", "火曜", "火曜日",
+      "水", "水曜", "水曜日",
+      "木", "木曜", "木曜日",
+      "金", "金曜", "金曜日",
+      "土", "土曜", "土曜日",
+    ].includes(value)
+  );
+  if (weekdayToken) {
+    return { token: weekdayToken, date: null, certainty: "ambiguous", ambiguity: { type: "weekday_only", weekday: inferWeekdayFromToken(weekdayToken) } };
+  }
+
   const token = tokens.find((value) =>
     ["今日", "明日", "来週金曜", "来週金曜日", "金", "金曜", "金曜日", "土", "土曜", "土曜日", "月", "月曜", "月曜日"].includes(value)
   );
@@ -1242,6 +1285,13 @@ function formatWeekdayName(weekday) {
 function inferWeekdayFromToken(token) {
   if (["日", "日曜", "日曜日"].includes(token)) return 0;
   if (["月", "月曜", "月曜日"].includes(token)) return 1;
+  if (["火", "火曜", "火曜日"].includes(token)) return 2;
+  if (["水", "水曜", "水曜日"].includes(token)) return 3;
+  if (["木", "木曜", "木曜日"].includes(token)) return 4;
+  if (["金", "金曜", "金曜日"].includes(token)) return 5;
+  if (["土", "土曜", "土曜日"].includes(token)) return 6;
+  if (["日", "日曜", "日曜日"].includes(token)) return 0;
+  if (["月", "月曜", "月曜日"].includes(token)) return 1;
   if (["金", "金曜", "金曜日"].includes(token)) return 5;
   if (["土", "土曜", "土曜日"].includes(token)) return 6;
   return 5;
@@ -1253,6 +1303,19 @@ function buildUpcomingWeekdayDate(weekday, followingWeek) {
   if (diff === 0) diff = 7;
   if (followingWeek) diff += 7;
   base.setDate(base.getDate() + diff);
+  return base;
+}
+
+function buildRelativeWeekdayDate(weekday, range) {
+  const base = stripTime(getCurrentNow());
+  const currentWeekday = base.getDay();
+  if (range === "this") {
+    base.setDate(base.getDate() + (weekday - currentWeekday));
+    return base;
+  }
+  let diff = (weekday - currentWeekday + 7) % 7;
+  if (diff === 0) diff = 7;
+  base.setDate(base.getDate() + diff + 7);
   return base;
 }
 

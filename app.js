@@ -208,6 +208,7 @@ function loadState() {
     try {
       const parsed = JSON.parse(saved);
       parsed.userLearning = parsed.userLearning || { termKinds: {}, history: [] };
+      parsed.items = (parsed.items || []).map(normalizeStoredItem);
       parsed.ui = {
         activeView: "home",
         homeVariant: "A",
@@ -250,6 +251,55 @@ function loadState() {
 function persist() {
   ensureLearningState();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function normalizeStoredItem(item) {
+  if (!item || !item.rawText) return item;
+  const parsedAsSchedule = parseRawText(item.rawText, "schedule");
+  const hasExactSchedule = Boolean(parsedAsSchedule.scheduledAt);
+  const looksLikeBuggyTodo = item.kind === "todo" && !item.scheduledAt && Boolean(item.deadlineAt) && hasExactSchedule;
+  const looksLikeMissingSchedule = item.kind === "schedule" && !item.scheduledAt && hasExactSchedule;
+  const looksLikeTimeAsTitle = item.title && /^\d{1,2}:\d{2}$/.test(item.title) && hasExactSchedule;
+
+  if (hasExactSchedule && (looksLikeBuggyTodo || looksLikeMissingSchedule || looksLikeTimeAsTitle)) {
+    return {
+      ...item,
+      kind: "schedule",
+      classification: "schedule",
+      title: parsedAsSchedule.title,
+      support: parsedAsSchedule.support,
+      action: parsedAsSchedule.action,
+      tokens: parsedAsSchedule.tokens,
+      scheduledAt: parsedAsSchedule.scheduledAt,
+      deadlineAt: null,
+      prepStartAt: buildPrepStartAt("schedule", parsedAsSchedule.scheduledAt, null),
+      nextActionAt: buildNextActionAt("schedule", parsedAsSchedule.scheduledAt, null, buildPrepStartAt("schedule", parsedAsSchedule.scheduledAt, null)),
+      ambiguity: parsedAsSchedule.ambiguity,
+      state: deriveState(
+        {
+          ...item,
+          kind: "schedule",
+          scheduledAt: parsedAsSchedule.scheduledAt,
+          deadlineAt: null,
+          prepStartAt: buildPrepStartAt("schedule", parsedAsSchedule.scheduledAt, null),
+          completedAt: item.completedAt || null,
+          ambiguity: parsedAsSchedule.ambiguity,
+        },
+        getCurrentNow().getTime()
+      ),
+    };
+  }
+
+  if (item.kind === "schedule" && item.scheduledAt && item.deadlineAt) {
+    return {
+      ...item,
+      deadlineAt: null,
+      prepStartAt: buildPrepStartAt("schedule", item.scheduledAt, null),
+      nextActionAt: buildNextActionAt("schedule", item.scheduledAt, null, buildPrepStartAt("schedule", item.scheduledAt, null)),
+    };
+  }
+
+  return item;
 }
 
 function ensureLearningState() {
@@ -881,9 +931,8 @@ function displayPrimaryTime(item) {
 
 function displaySupport(item) {
   if (item.state === STATES.PAST_UNCONFIRMED) {
-    const originalTime = item.scheduledAt ? formatTimeOnly(item.scheduledAt) : item.deadlineAt ? formatTimeOnly(item.deadlineAt) : "";
     const pastLine = state.ui.language === "ja" ? "予定時刻を過ぎています" : "The scheduled time has passed.";
-    return [originalTime ? `${originalTime} ${item.title}` : "", pastLine, item.support || ""].filter(Boolean).join("\n");
+    return [pastLine, item.support || ""].filter(Boolean).join("\n");
   }
   if (item.state === STATES.INBOX) return item.support || item.rawText;
   if (item.state === STATES.DATE_UNCONFIRMED) return t("dateUnconfirmedSupport");

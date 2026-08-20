@@ -560,10 +560,11 @@ textarea {
 .app-shell[data-home-variant="B"] .focus-action-primary {
   display: inline-flex;
   align-items: flex-start;
-  gap: 16px;
-  font-size: 1.08rem;
-  font-weight: 400;
-  letter-spacing: 0.16em;
+  gap: 12px;
+  font-size: 0.82rem;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  color: #2a2a2a;
 }
 
 .app-shell[data-home-variant="B"] .focus-action-middle {
@@ -581,40 +582,40 @@ textarea {
 .app-shell[data-home-variant="B"] .focus-action:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
-  letter-spacing: 0.16em;
+  opacity: 0.88;
 }
 
 .app-shell[data-home-variant="B"] .focus-action-text {
   display: inline-grid;
-  gap: 4px;
+  gap: 3px;
 }
 
 .app-shell[data-home-variant="B"] .focus-action-label {
   display: inline-block;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .app-shell[data-home-variant="B"] .focus-action-note {
   display: inline-block;
-  font-size: 0.62rem;
+  font-size: 0.56rem;
   line-height: 1;
-  letter-spacing: 0.18em;
-  color: #7a7a7a;
+  letter-spacing: 0.22em;
+  color: #8c8c8c;
 }
 
 .app-shell[data-home-variant="B"] .focus-action-sign {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
   margin-top: 1px;
 }
 
 .app-shell[data-home-variant="B"] .focus-action-sign-icon {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
 }
 
 .app-shell[data-home-variant="B"] .focus-action-sign-icon path {
@@ -623,6 +624,22 @@ textarea {
   stroke-width: 1;
   stroke-linecap: butt;
   stroke-linejoin: miter;
+}
+
+.app-shell[data-home-variant="B"] .focus-action-confirm-copy {
+  font-size: 0.72rem;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  color: #6c6c6c;
+  text-decoration: none;
+  cursor: default;
+  pointer-events: none;
+  margin-bottom: 6px;
+}
+
+.app-shell[data-home-variant="B"] .focus-actions [data-action-kind="primary"],
+.app-shell[data-home-variant="B"] .focus-action-confirm-copy {
+  justify-self: start;
 }
 
 .app-shell[data-home-variant="B"] .focus-article-b {
@@ -637,8 +654,8 @@ textarea {
   position: fixed;
   right: 36px;
   bottom: 36px;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   pointer-events: none;
   opacity: 0;
   transform: translate3d(0, 0, 0) scale(0.96);
@@ -649,8 +666,8 @@ textarea {
 }
 
 .completion-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .completion-icon path {
@@ -662,7 +679,7 @@ textarea {
 }
 
 .app-shell[data-home-variant="B"] .focus-actions [data-action-kind="primary"] {
-  margin-top: 4px;
+  margin-top: 10px;
 }
 
 @keyframes bCompleteFade {

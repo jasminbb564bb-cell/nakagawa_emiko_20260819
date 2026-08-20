@@ -58,6 +58,8 @@ const translations = {
     needInfoSupport: "時間や期限を後で確認します",
     doneAction: "終える",
     doneActionNote: "END",
+    doneQuestion: "この予定を終えますか",
+    backAction: "戻る",
     rescheduleAction: "あらためる",
     changeTimeAction: "時間を変える",
     makeSchedule: "予定にする",
@@ -112,6 +114,8 @@ const translations = {
     needInfoSupport: "We need time or due date later.",
     doneAction: "Done",
     doneActionNote: "END",
+    doneQuestion: "Finish this item?",
+    backAction: "Back",
     rescheduleAction: "Reschedule",
     changeTimeAction: "Change time",
     makeSchedule: "Make it an event",
@@ -223,6 +227,7 @@ function loadState() {
         memoStatus: "",
         editStatus: "",
         editingItemId: null,
+        pendingDoneItemId: null,
         ...parsed.ui,
       };
       return parsed;
@@ -246,6 +251,7 @@ function loadState() {
       memoStatus: "",
       editStatus: "",
       editingItemId: null,
+      pendingDoneItemId: null,
     },
   };
 }
@@ -727,7 +733,7 @@ function renderFocusCardInto(container, template, item, variant) {
   fragment.querySelector(".focus-title").textContent = buildFocusTitle(item);
   fragment.querySelector(".focus-support").textContent = displaySupport(item);
   const actions = fragment.querySelector(".focus-actions");
-  buildFocusActions(item).forEach((action) => {
+  buildFocusActions(item, variant).forEach((action) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = variant === "B" ? `focus-action focus-action-${action.kind}` : "focus-action focus-action-a";
@@ -752,6 +758,9 @@ function renderFocusCardInto(container, template, item, variant) {
       note.textContent = t("doneActionNote");
       textWrap.append(label, note);
       button.append(sign, textWrap);
+    } else if (variant === "B" && action.kind === "confirm-copy") {
+      button.classList.add("focus-action-confirm-copy");
+      button.textContent = action.label;
     } else {
       button.textContent = action.label;
     }
@@ -768,9 +777,16 @@ function buildFocusTitle(item) {
   return item.title;
 }
 
-function buildFocusActions(item) {
+function buildFocusActions(item, variant) {
   if (item.state === STATES.PAST_UNCONFIRMED) {
     markPrompted(item);
+    if (variant === "B" && state.ui.pendingDoneItemId === item.id) {
+      return [
+        { label: t("doneQuestion"), kind: "confirm-copy", onClick: () => {} },
+        { label: t("doneAction"), kind: "primary", onClick: () => confirmCompleteAction(item.id) },
+        { label: t("backAction"), kind: "subtle", onClick: () => cancelCompleteAction() },
+      ];
+    }
     return [
       { label: t("doneAction"), kind: "primary", onClick: () => handleCompleteAction(item.id) },
       { label: t("rescheduleAction"), kind: "middle", onClick: () => sendToNeedInfo(item.id) },
@@ -1079,11 +1095,28 @@ function openEditView(itemId) {
 }
 
 function handleCompleteAction(itemId) {
+  if (state.ui.homeVariant === "B") {
+    state.ui.pendingDoneItemId = state.ui.pendingDoneItemId === itemId ? null : itemId;
+    persist();
+    render();
+    return;
+  }
+  confirmCompleteAction(itemId);
+}
+
+function confirmCompleteAction(itemId) {
+  state.ui.pendingDoneItemId = null;
   if (state.ui.homeVariant !== "B") {
     markDone(itemId);
     return;
   }
   playCompletionAnimation(document.querySelector("#focus-card-b .focus-article-b"), () => markDone(itemId));
+}
+
+function cancelCompleteAction() {
+  state.ui.pendingDoneItemId = null;
+  persist();
+  render();
 }
 
 function markDone(itemId) {
@@ -1145,6 +1178,7 @@ function toggleFabMenu() {
 function openView(viewName) {
   state.ui.activeView = viewName;
   state.ui.fabOpen = false;
+  state.ui.pendingDoneItemId = null;
   clearStatuses();
   persist();
   render();

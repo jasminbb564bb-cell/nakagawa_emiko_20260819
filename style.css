@@ -144,8 +144,7 @@ textarea {
 }
 
 .home-variant-switch,
-.sort-switch,
-.language-switch {
+.sort-switch {
   display: flex;
   gap: 4px;
   align-items: center;
@@ -165,15 +164,7 @@ textarea {
 }
 
 .language-switch {
-  border: none;
-  padding: 0;
-  background: transparent;
-  gap: 18px;
-  visibility: visible;
-  opacity: 1;
-  position: relative;
-  z-index: 20;
-  flex-shrink: 0;
+  display: none;
 }
 
 .app-shell[data-home-variant="B"] .home-variant-switch {
@@ -193,6 +184,12 @@ textarea {
   display: grid;
   justify-items: start;
   gap: 12px;
+  border: none;
+  padding: 0;
+  background: transparent;
+  visibility: visible;
+  opacity: 1;
+  z-index: 20;
   letter-spacing: 0.18em;
 }
 
@@ -243,6 +240,7 @@ textarea {
   min-width: 0;
   padding: 0;
   letter-spacing: 0.18em;
+  border-bottom: 1px solid transparent;
 }
 
 .app-shell[data-home-variant="B"] .language-button {

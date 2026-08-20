@@ -1,4 +1,4 @@
-const STORAGE_KEY = "quiet-todo-flow-v12";
+const STORAGE_KEY = "quiet-todo-flow-v13";
 const TOKYO_TIME_ZONE = "Asia/Tokyo";
 
 const STATES = {
@@ -11,7 +11,7 @@ const STATES = {
   DONE: "DONE",
 };
 
-const TRANSLATIONS = {
+const translations = {
   ja: {
     heroMain: "今必要なことだけを、静かに見る。",
     heroSub: "思いついたら雑に入れて、見るときだけ整える。",
@@ -51,8 +51,8 @@ const TRANSLATIONS = {
     inboxLabel: "Inbox",
     needsInfoLabel: "後で確認",
     dateUnconfirmedLabel: "日付未確認",
-    pastQuestion: "どうなりましたか",
-    dateQuestion: "いつの{weekday}ですか",
+    pastQuestion: "どうなりましたか？",
+    dateQuestion: "いつの{weekday}ですか？",
     inboxQuestion: "予定ですか？",
     dateUnconfirmedSupport: "日付がまだ確定していません",
     needInfoSupport: "時間や期限を後で確認します",
@@ -79,9 +79,9 @@ const TRANSLATIONS = {
     viewAll: "View all",
     sortPriority: "Priority",
     sortTime: "Timeline",
-    newSchedule: "New schedule",
-    addTodo: "Add todo",
-    memo: "Memo",
+    newSchedule: "New event",
+    addTodo: "Add task",
+    memo: "Note",
     entryMain: "Write freely. Separate with spaces.",
     entrySub: "Leave it here. We'll sort it.",
     rawInput: "Raw input",
@@ -106,13 +106,13 @@ const TRANSLATIONS = {
     dateUnconfirmedLabel: "Date unconfirmed",
     pastQuestion: "How did it go?",
     dateQuestion: "Which {weekday} is it?",
-    inboxQuestion: "Is this a plan?",
+    inboxQuestion: "Is this an event?",
     dateUnconfirmedSupport: "The date has not been confirmed yet.",
     needInfoSupport: "We need time or due date later.",
     doneAction: "Done",
     rescheduleAction: "Reschedule",
     changeTimeAction: "Change time",
-    makeSchedule: "Make it a plan",
+    makeSchedule: "Make it an event",
     research: "Look into it",
     keepAsIs: "Leave it",
     nextOption: "Next {date}",
@@ -225,8 +225,8 @@ function persist() {
 }
 
 function t(key, vars = {}) {
-  const table = TRANSLATIONS[state.ui.language] || TRANSLATIONS.ja;
-  let text = table[key] || TRANSLATIONS.ja[key] || key;
+  const table = translations[state.ui.language] || translations.ja;
+  let text = table[key] || translations.ja[key] || key;
   Object.entries(vars).forEach(([name, value]) => {
     text = text.replace(`{${name}}`, value);
   });
@@ -531,7 +531,7 @@ function render() {
 }
 
 function applyStaticTranslations() {
-  document.documentElement.lang = state.ui.language;
+  document.documentElement.lang = state.ui.language === "ja" ? "ja" : "en";
   document.querySelectorAll("[data-i18n]").forEach((node) => {
     node.textContent = t(node.dataset.i18n);
   });
@@ -617,7 +617,6 @@ function renderFocusCardInto(container, template, item, variant) {
     container.innerHTML = `<article class="focus-article"><p class="focus-time">${t("nowLabel")}</p><h1 class="focus-title">${t("homeEmptyTitle")}</h1><p class="focus-support">${t("homeEmptyMeta")}</p></article>`;
     return;
   }
-
   const fragment = template.content.cloneNode(true);
   fragment.querySelector(".focus-time").textContent = displayPrimaryTime(item);
   fragment.querySelector(".focus-title").textContent = buildFocusTitle(item);
@@ -711,7 +710,6 @@ function renderAllList() {
     allList.innerHTML = `<p class="all-empty">${t("allEmpty")}</p>`;
     return;
   }
-
   items.forEach((item) => {
     const fragment = allItemTemplate.content.cloneNode(true);
     const article = fragment.querySelector(".all-item");
@@ -754,8 +752,8 @@ function getAllItemsSorted() {
 }
 
 function compareByPriority(left, right) {
-  const scoreDiff = calculatePriorityScore(right) - calculatePriorityScore(left);
-  return scoreDiff !== 0 ? scoreDiff : compareByTime(left, right);
+  const diff = calculatePriorityScore(right) - calculatePriorityScore(left);
+  return diff !== 0 ? diff : compareByTime(left, right);
 }
 
 function compareByTime(left, right) {
@@ -766,7 +764,7 @@ function compareByTime(left, right) {
 }
 
 function calculatePriorityScore(item) {
-  const stateWeight = {
+  const weights = {
     [STATES.PAST_UNCONFIRMED]: 600,
     [STATES.ACTION_NOW]: 500,
     [STATES.UPCOMING]: 400,
@@ -775,7 +773,7 @@ function calculatePriorityScore(item) {
     [STATES.NEED_INFO]: 180,
     [STATES.DONE]: -999,
   };
-  let score = stateWeight[item.state] || 0;
+  let score = weights[item.state] || 0;
   const now = getCurrentNow().getTime();
   const anchor = getChronologicalValue(item);
   if (anchor !== Number.MAX_SAFE_INTEGER) {
@@ -793,7 +791,7 @@ function getChronologicalValue(item) {
   const values = [item.prepStartAt, item.scheduledAt, item.deadlineAt, item.nextActionAt]
     .filter(Boolean)
     .map((value) => new Date(value).getTime())
-    .sort((left, right) => left - right);
+    .sort((a, b) => a - b);
   return values[0] ?? Number.MAX_SAFE_INTEGER;
 }
 
@@ -927,7 +925,10 @@ function markDone(itemId) {
 }
 
 function playCompletionAnimation(targetNode, onComplete) {
-  if (!targetNode) return onComplete();
+  if (!targetNode) {
+    onComplete();
+    return;
+  }
   const icon = state.ui.completionMode === "trash" ? completionIconTrash : completionIconArchive;
   const otherIcon = state.ui.completionMode === "trash" ? completionIconArchive : completionIconTrash;
   otherIcon.classList.add("is-hidden");
@@ -1018,8 +1019,7 @@ function formatMonthDay(date) {
 function formatWeekdayName(weekday) {
   const ja = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
   const en = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const table = state.ui.language === "ja" ? ja : en;
-  return table[weekday ?? 5];
+  return (state.ui.language === "ja" ? ja : en)[weekday ?? 5];
 }
 
 function inferWeekdayFromToken(token) {

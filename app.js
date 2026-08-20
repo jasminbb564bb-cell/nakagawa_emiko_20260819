@@ -729,7 +729,26 @@ function renderFocusCardInto(container, template, item, variant) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = variant === "B" ? `focus-action focus-action-${action.kind}` : "focus-action focus-action-a";
-    button.textContent = action.label;
+    if (variant === "B") button.dataset.actionKind = action.kind;
+    if (variant === "B" && action.kind === "primary") {
+      const sign = document.createElement("span");
+      sign.className = "focus-action-sign";
+      sign.setAttribute("aria-hidden", "true");
+      sign.innerHTML = `
+        <svg viewBox="0 0 16 16" class="focus-action-sign-icon">
+          <path d="M3.8 10.9H12.2"></path>
+          <path d="M5 10.9V12.4H11V10.9"></path>
+          <path d="M8 4.1V8.6"></path>
+          <path d="M6.8 7.5L8 8.8L9.2 7.5"></path>
+        </svg>
+      `;
+      const label = document.createElement("span");
+      label.className = "focus-action-label";
+      label.textContent = action.label;
+      button.append(sign, label);
+    } else {
+      button.textContent = action.label;
+    }
     button.addEventListener("click", action.onClick);
     actions.appendChild(button);
   });

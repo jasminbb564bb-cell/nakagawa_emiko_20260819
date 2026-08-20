@@ -10,120 +10,191 @@
 
 <body>
   <div class="app-shell">
-    <section id="hero-intro" class="hero-intro hero-intro-standalone">
-      <svg class="hero-intro-circle" viewBox="0 0 480 480" aria-hidden="true">
-        <circle cx="240" cy="240" r="190"></circle>
-      </svg>
-      <div class="hero-intro-copy"></div>
-    </section>
-
-    <header class="top-date" id="top-date"></header>
+    <header class="top-bar">
+      <p class="top-date" id="top-date"></p>
+      <div class="home-variant-switch" aria-label="&#12507;&#12540;&#12512;&#34920;&#31034;&#20999;&#12426;&#26367;&#12360;">
+        <button id="variant-a" class="variant-button" type="button" data-variant="A">A</button>
+        <button id="variant-b" class="variant-button" type="button" data-variant="B">B</button>
+      </div>
+    </header>
 
     <main class="layout">
-      <section id="main-view" class="main-view">
-        <section class="hero" aria-labelledby="hero-heading">
-          <div class="hero-head">
-            <p class="eyebrow" id="hero-heading">&#20170;&#12289;&#12377;&#12427;&#12371;&#12392;</p>
-            <button id="all-toggle" class="subtle-link" type="button">&#12377;&#12409;&#12390;&#35211;&#12427;</button>
+      <section id="home-view" class="view-section">
+        <section id="home-pattern-a" class="home-pattern home-pattern-a" aria-labelledby="home-heading-a">
+          <section class="hero-intro hero-intro-standalone" aria-labelledby="hero-intro-heading">
+            <p class="section-mark" id="hero-intro-heading">Quiet Todo</p>
+            <div class="hero-intro-copy">
+              <p class="hero-intro-main">&#20170;&#24517;&#35201;&#12394;&#12371;&#12392;&#12384;&#12369;&#12434;&#12289;&#38745;&#12363;&#12395;&#35211;&#12427;&#12290;</p>
+              <p class="hero-intro-sub">&#24605;&#12356;&#12388;&#12356;&#12383;&#12425;&#38609;&#12395;&#20837;&#12428;&#12390;&#12289;&#35211;&#12427;&#12392;&#12365;&#12384;&#12369;&#25972;&#12360;&#12427;&#12290;</p>
+            </div>
+          </section>
+          <div class="spatial-frame home-flow">
+            <div class="flow-main">
+              <p class="section-mark" id="home-heading-a">Now</p>
+              <div id="focus-card-a" class="focus-card"></div>
+            </div>
+            <aside class="flow-side" aria-label="Home navigation">
+              <nav class="side-rail">
+                <span class="side-rail-item is-current">home</span>
+                <span class="side-rail-item">all</span>
+                <span class="side-rail-item">input</span>
+              </nav>
+            </aside>
           </div>
-          <div id="focus-card" class="focus-card"></div>
-          <div class="hero-foot">
-            <button id="later-toggle" class="subtle-link" type="button"></button>
-          </div>
+          <section class="next-block" aria-labelledby="next-heading-a">
+            <p class="section-mark" id="next-heading-a">Next</p>
+            <div id="next-card-a" class="next-card"></div>
+          </section>
         </section>
 
-        <section class="panel input-panel" aria-labelledby="input-heading">
-          <p class="eyebrow" id="input-heading">&#20837;&#21147;</p>
-          <div id="input-guide" class="inline-guide"></div>
-          <label class="sr-only" for="quick-input">Todo</label>
-          <textarea id="quick-input" class="quiet-input" rows="4"
-            placeholder="&#12473;&#12540;&#12497;&#12540; &#20170;&#26085; 18&#26178;"></textarea>
-          <div class="input-actions">
-            <button id="create-task" class="text-button" type="button">&#38928;&#12369;&#12427;</button>
-            <p class="subtle-status" id="input-status"></p>
+        <section id="home-pattern-b" class="home-pattern home-pattern-b is-hidden" aria-labelledby="home-heading-b">
+          <div class="b-home-shell">
+            <aside class="b-home-left-rail" aria-hidden="true">
+              <div class="b-home-social">quiet todo</div>
+              <div class="b-home-copyright">2026 quiet todo</div>
+            </aside>
+            <section class="b-home-main">
+              <nav class="b-home-top-nav" aria-label="Home B navigation">
+                <span class="b-home-nav-item">home</span>
+                <span class="b-home-nav-item">all</span>
+                <span class="b-home-nav-item">input</span>
+              </nav>
+              <div class="b-home-focus-wrap">
+                <div id="focus-card-b" class="focus-card"></div>
+              </div>
+              <div class="b-home-next-wrap" aria-labelledby="home-heading-b">
+                <p class="section-mark" id="home-heading-b">Next</p>
+                <div id="next-card-b" class="next-card"></div>
+              </div>
+            </section>
+            <aside class="b-home-right-rail">
+              <div class="b-home-brand">H O M E</div>
+              <div class="b-home-subrail">
+                <span>now</span>
+                <span>next</span>
+              </div>
+            </aside>
           </div>
-        </section>
-
-        <section class="panel choice-panel is-hidden" id="choice-panel" aria-labelledby="choice-heading">
-          <p class="eyebrow" id="choice-heading">&#12393;&#12358;&#25201;&#12356;&#12414;&#12377;&#12363;</p>
-          <div id="choice-card" class="choice-card"></div>
-        </section>
-
-        <section class="panel later-panel is-hidden" id="later-panel" aria-labelledby="later-heading">
-          <p class="eyebrow" id="later-heading">&#12354;&#12392;&#12391;&#35211;&#12427;&#12418;&#12398;</p>
-          <div id="later-list" class="later-list"></div>
         </section>
       </section>
 
-      <section id="all-view" class="panel all-view is-hidden" aria-labelledby="all-heading">
-        <div class="all-view-head">
-          <p class="eyebrow" id="all-heading">&#12377;&#12409;&#12390;&#12398;&#20104;&#23450;</p>
-          <button id="back-to-main" class="subtle-link" type="button">&#25147;&#12427;</button>
+      <section id="all-view" class="view-section is-hidden" aria-labelledby="all-heading">
+        <div class="view-head">
+          <button id="back-from-all" class="subtle-link" type="button">&#25147;&#12427;</button>
         </div>
-        <div class="filter-row" id="filter-row">
-          <button class="filter-chip is-active" data-filter="all" type="button">&#12377;&#12409;&#12390;</button>
-          <button class="filter-chip" data-filter="now" type="button">&#20170;</button>
-          <button class="filter-chip" data-filter="later" type="button">&#12354;&#12392;&#12391;</button>
-          <button class="filter-chip" data-filter="completed" type="button">&#23436;&#20102;</button>
+        <section class="all-stage">
+          <div class="all-stage-head">
+            <p class="section-mark" id="all-heading">&#12377;&#12409;&#12390;&#12434;&#35211;&#12427;</p>
+            <div class="sort-switch" id="sort-switch" aria-label="&#20006;&#12403;&#26367;&#12360;">
+              <button class="sort-button" type="button" data-sort="priority">&#20778;&#20808;&#38918;</button>
+              <button class="sort-button" type="button" data-sort="time">&#26178;&#38291;&#38918;</button>
+            </div>
+          </div>
+          <div id="all-list" class="all-list"></div>
+        </section>
+      </section>
+
+      <section id="schedule-view" class="view-section is-hidden" aria-labelledby="schedule-heading">
+        <div class="view-head">
+          <button id="back-from-schedule" class="subtle-link" type="button">&#25147;&#12427;</button>
         </div>
-        <div id="all-list" class="all-list"></div>
-        <div class="developer-area">
-          <button id="debug-toggle" class="subtle-link"
-            type="button">&#20445;&#23384;&#12487;&#12540;&#12479;&#12434;&#30906;&#35469;</button>
-          <pre id="debug-json" class="debug-json is-hidden"></pre>
+        <section class="entry-stage">
+          <p class="section-mark" id="schedule-heading">&#26032;&#12375;&#12356;&#20104;&#23450;</p>
+          <form id="schedule-form" class="entry-form">
+            <div class="entry-copy">
+              <p class="entry-copy-main">&#24605;&#12356;&#12388;&#12356;&#12383;&#12414;&#12414;&#12289;&#12473;&#12506;&#12540;&#12473;&#12391;&#12290;</p>
+              <p class="entry-copy-sub">Leave it here. We&apos;ll sort it.</p>
+            </div>
+            <label class="entry-label" for="schedule-raw">&#38609;&#12395;&#20837;&#21147;</label>
+            <textarea id="schedule-raw" class="entry-box" rows="6"
+              placeholder="&#27503;&#21307;&#32773; &#20104;&#32004; 15&#26178;"></textarea>
+            <p class="subtle-status" id="schedule-status"></p>
+            <button class="primary-button" type="submit">&#20445;&#23384;</button>
+          </form>
+        </section>
+      </section>
+
+      <section id="todo-view" class="view-section is-hidden" aria-labelledby="todo-heading">
+        <div class="view-head">
+          <button id="back-from-todo" class="subtle-link" type="button">&#25147;&#12427;</button>
         </div>
+        <section class="entry-stage">
+          <p class="section-mark" id="todo-heading">&#12420;&#12427;&#12371;&#12392;&#12434;&#36861;&#21152;</p>
+          <form id="todo-form" class="entry-form">
+            <div class="entry-copy">
+              <p class="entry-copy-main">&#24605;&#12356;&#12388;&#12356;&#12383;&#12414;&#12414;&#12289;&#12473;&#12506;&#12540;&#12473;&#12391;&#12290;</p>
+              <p class="entry-copy-sub">Leave it here. We&apos;ll sort it.</p>
+            </div>
+            <label class="entry-label" for="todo-raw">&#38609;&#12395;&#20837;&#21147;</label>
+            <textarea id="todo-raw" class="entry-box" rows="6"
+              placeholder="&#35506;&#38988; &#25552;&#20986; &#37329;&#26332; &#20808;&#29983;"></textarea>
+            <p class="subtle-status" id="todo-status"></p>
+            <button class="primary-button" type="submit">&#20445;&#23384;</button>
+          </form>
+        </section>
+      </section>
+
+      <section id="memo-view" class="view-section is-hidden" aria-labelledby="memo-heading">
+        <div class="view-head">
+          <button id="back-from-memo" class="subtle-link" type="button">&#25147;&#12427;</button>
+        </div>
+        <section class="entry-stage">
+          <p class="section-mark" id="memo-heading">&#12513;&#12514;</p>
+          <form id="memo-form" class="entry-form">
+            <div class="entry-copy">
+              <p class="entry-copy-main">&#24605;&#12356;&#12388;&#12356;&#12383;&#12414;&#12414;&#12289;&#12473;&#12506;&#12540;&#12473;&#12391;&#12290;</p>
+              <p class="entry-copy-sub">Leave it here. We&apos;ll sort it.</p>
+            </div>
+            <label class="entry-label" for="memo-raw">&#38609;&#12395;&#20837;&#21147;</label>
+            <textarea id="memo-raw" class="entry-box" rows="6"
+              placeholder="&#38738;&#26862;&#30476;&#31435;&#32654;&#34899;&#39208; &#23637;&#31034;"></textarea>
+            <p class="subtle-status" id="memo-status"></p>
+            <button class="primary-button" type="submit">&#20445;&#23384;</button>
+          </form>
+        </section>
       </section>
     </main>
   </div>
 
-  <template id="focus-template">
-    <article class="task-card">
-      <p class="task-kicker"></p>
-      <div class="task-time"></div>
-      <h1 class="task-title"></h1>
-      <p class="task-copy"></p>
-      <p class="inline-guide is-soft is-hidden"></p>
-      <div class="task-actions"></div>
+  <div class="fab-wrap">
+    <div id="fab-menu" class="fab-menu is-hidden" role="menu" aria-label="&#36861;&#21152;&#12513;&#12491;&#12517;&#12540;">
+      <button class="fab-menu-item" type="button" data-open-view="schedule">&#26032;&#12375;&#12356;&#20104;&#23450;</button>
+      <button class="fab-menu-item" type="button" data-open-view="todo">&#12420;&#12427;&#12371;&#12392;&#12434;&#36861;&#21152;</button>
+      <button class="fab-menu-item" type="button" data-open-view="memo">&#12513;&#12514;</button>
+      <button class="fab-menu-item" type="button" data-open-view="all">&#12377;&#12409;&#12390;&#12434;&#35211;&#12427;</button>
+    </div>
+    <button id="fab-button" class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu">+</button>
+  </div>
+
+  <template id="focus-template-a">
+    <article class="focus-article focus-article-a">
+      <p class="focus-time"></p>
+      <h1 class="focus-title"></h1>
+      <p class="focus-support"></p>
     </article>
   </template>
 
-  <template id="choice-template">
-    <article class="choice-item">
-      <p class="task-kicker">&#26032;&#12375;&#12367;&#38928;&#12363;&#12387;&#12383;&#12371;&#12392;</p>
-      <h2 class="choice-title"></h2>
-      <p class="task-copy"></p>
-      <div class="inline-guide is-soft is-hidden" id="choice-guide"></div>
-      <div class="task-actions">
-        <button class="text-button" data-choice="now" type="button">&#20170;</button>
-        <button class="text-button" data-choice="later" type="button">&#12354;&#12392;&#12391;</button>
-        <button class="text-button" data-choice="soon"
-          type="button">1&#20998;&#24460;&#12395;&#20877;&#34920;&#31034;</button>
-      </div>
+  <template id="focus-template-b">
+    <article class="focus-article focus-article-b">
+      <p class="focus-time"></p>
+      <h1 class="focus-title"></h1>
+      <p class="focus-support"></p>
     </article>
   </template>
 
-  <template id="later-item-template">
-    <article class="later-item">
-      <div>
-        <p class="task-kicker"></p>
-        <h2 class="later-title"></h2>
-        <p class="record-meta"></p>
-      </div>
-      <button class="text-button" data-action="show-now" type="button">&#20170;&#35211;&#12427;</button>
+  <template id="next-template">
+    <article class="next-article">
+      <p class="next-time"></p>
+      <h2 class="next-title"></h2>
+      <p class="next-support"></p>
     </article>
   </template>
 
   <template id="all-item-template">
     <article class="all-item">
-      <div class="all-item-main">
-        <p class="task-kicker"></p>
-        <h2 class="later-title"></h2>
-        <p class="record-meta all-raw"></p>
-        <p class="record-meta"></p>
-      </div>
-      <div class="all-item-actions">
-        <button class="text-button danger-button" data-action="delete" type="button">&#21066;&#38500;</button>
-      </div>
+      <p class="all-time"></p>
+      <h2 class="all-title"></h2>
+      <p class="all-support"></p>
     </article>
   </template>
 

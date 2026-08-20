@@ -1,4 +1,4 @@
-const STORAGE_KEY = "quiet-todo-flow-v11";
+const STORAGE_KEY = "quiet-todo-flow-v12";
 const TOKYO_TIME_ZONE = "Asia/Tokyo";
 
 const STATES = {
@@ -11,24 +11,114 @@ const STATES = {
   DONE: "DONE",
 };
 
-const T = {
-  homeEmptyTitle: "いまは静かです",
-  homeEmptyMeta: "次にすることは、まだありません。",
-  nextEmptyTitle: "次の予定はありません",
-  allEmpty: "表示できる項目はありません。",
-  required: "入力してください",
-  saved: "保存しました",
-  updated: "書き直しました",
-  nowLabel: "いま",
-  inboxLabel: "Inbox",
-  untilLabel: "まで",
-  needsInfoLabel: "後で確認",
-  dateUnconfirmedLabel: "日付未確認",
-  pastQuestion: "どうなりましたか",
-  rewrite: "書き直す",
+const TRANSLATIONS = {
+  ja: {
+    heroMain: "今必要なことだけを、静かに見る。",
+    heroSub: "思いついたら雑に入れて、見るときだけ整える。",
+    nowHeading: "Now",
+    nextHeading: "Next",
+    navHome: "home",
+    navAll: "all",
+    navInput: "input",
+    navNowLower: "now",
+    navNextLower: "next",
+    back: "戻る",
+    viewAll: "すべてを見る",
+    sortPriority: "優先順",
+    sortTime: "時間順",
+    newSchedule: "新しい予定",
+    addTodo: "やることを追加",
+    memo: "メモ",
+    entryMain: "思いついたまま、スペースで。",
+    entrySub: "Leave it here. We'll sort it.",
+    rawInput: "雑に入力",
+    inputText: "入力文",
+    save: "保存",
+    rewrite: "書き直す",
+    editMain: "元の入力文をそのまま書き直します。",
+    editSub: "Leave it here. We'll sort it again.",
+    schedulePlaceholder: "歯医者 予約 15時",
+    todoPlaceholder: "課題 提出 金曜 先生",
+    memoPlaceholder: "青森県立美術館 展示",
+    homeEmptyTitle: "いまは静かです",
+    homeEmptyMeta: "次にすることは、まだありません。",
+    nextEmptyTitle: "次の予定はありません",
+    allEmpty: "表示できる項目はありません。",
+    required: "入力してください",
+    saved: "保存しました",
+    updated: "書き直しました",
+    nowLabel: "いま",
+    inboxLabel: "Inbox",
+    needsInfoLabel: "後で確認",
+    dateUnconfirmedLabel: "日付未確認",
+    pastQuestion: "どうなりましたか",
+    dateQuestion: "いつの{weekday}ですか",
+    inboxQuestion: "予定ですか？",
+    dateUnconfirmedSupport: "日付がまだ確定していません",
+    needInfoSupport: "時間や期限を後で確認します",
+    doneAction: "終える",
+    rescheduleAction: "あらためる",
+    changeTimeAction: "時間を変える",
+    makeSchedule: "予定にする",
+    research: "調べる",
+    keepAsIs: "そのまま",
+    nextOption: "次 {date}",
+    followingOption: "来週 {date}",
+  },
+  en: {
+    heroMain: "See only what matters now.",
+    heroSub: "Capture it roughly. Let it settle when you look.",
+    nowHeading: "Now",
+    nextHeading: "Next",
+    navHome: "home",
+    navAll: "all",
+    navInput: "input",
+    navNowLower: "now",
+    navNextLower: "next",
+    back: "Back",
+    viewAll: "View all",
+    sortPriority: "Priority",
+    sortTime: "Timeline",
+    newSchedule: "New schedule",
+    addTodo: "Add todo",
+    memo: "Memo",
+    entryMain: "Write freely. Separate with spaces.",
+    entrySub: "Leave it here. We'll sort it.",
+    rawInput: "Raw input",
+    inputText: "Input",
+    save: "Save",
+    rewrite: "Rewrite",
+    editMain: "Rewrite the original input directly.",
+    editSub: "Leave it here. We'll sort it again.",
+    schedulePlaceholder: "Dentist appointment 3pm",
+    todoPlaceholder: "Assignment submit Friday teacher",
+    memoPlaceholder: "Aomori Museum exhibition",
+    homeEmptyTitle: "Quiet for now",
+    homeEmptyMeta: "There is nothing next just yet.",
+    nextEmptyTitle: "No next plan",
+    allEmpty: "There is nothing to show.",
+    required: "Please enter something",
+    saved: "Saved",
+    updated: "Updated",
+    nowLabel: "Now",
+    inboxLabel: "Inbox",
+    needsInfoLabel: "Need info",
+    dateUnconfirmedLabel: "Date unconfirmed",
+    pastQuestion: "How did it go?",
+    dateQuestion: "Which {weekday} is it?",
+    inboxQuestion: "Is this a plan?",
+    dateUnconfirmedSupport: "The date has not been confirmed yet.",
+    needInfoSupport: "We need time or due date later.",
+    doneAction: "Done",
+    rescheduleAction: "Reschedule",
+    changeTimeAction: "Change time",
+    makeSchedule: "Make it a plan",
+    research: "Look into it",
+    keepAsIs: "Leave it",
+    nextOption: "Next {date}",
+    followingOption: "Following {date}",
+  },
 };
-
-const state = loadState();
 
 const appShell = document.querySelector(".app-shell");
 const htmlRoot = document.documentElement;
@@ -73,6 +163,8 @@ const focusTemplateB = document.querySelector("#focus-template-b");
 const nextTemplate = document.querySelector("#next-template");
 const allItemTemplate = document.querySelector("#all-item-template");
 
+const state = loadState();
+
 boot();
 
 function boot() {
@@ -89,6 +181,20 @@ function loadState() {
     try {
       const parsed = JSON.parse(saved);
       parsed.userLearning = parsed.userLearning || { termKinds: {}, history: [] };
+      parsed.ui = {
+        activeView: "home",
+        homeVariant: "A",
+        completionMode: "archive",
+        sortMode: "priority",
+        language: "ja",
+        fabOpen: false,
+        scheduleStatus: "",
+        todoStatus: "",
+        memoStatus: "",
+        editStatus: "",
+        editingItemId: null,
+        ...parsed.ui,
+      };
       return parsed;
     } catch (_error) {
       localStorage.removeItem(STORAGE_KEY);
@@ -97,15 +203,13 @@ function loadState() {
 
   return {
     items: [],
-    userLearning: {
-      termKinds: {},
-      history: [],
-    },
+    userLearning: { termKinds: {}, history: [] },
     ui: {
       activeView: "home",
       homeVariant: "A",
       completionMode: "archive",
       sortMode: "priority",
+      language: "ja",
       fabOpen: false,
       scheduleStatus: "",
       todoStatus: "",
@@ -120,9 +224,17 @@ function persist() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+function t(key, vars = {}) {
+  const table = TRANSLATIONS[state.ui.language] || TRANSLATIONS.ja;
+  let text = table[key] || TRANSLATIONS.ja[key] || key;
+  Object.entries(vars).forEach(([name, value]) => {
+    text = text.replace(`{${name}}`, value);
+  });
+  return text;
+}
+
 function seedIfEmpty() {
   if (state.items.length > 0) return;
-
   const now = getCurrentNow();
   state.items.push(
     enrichItemFromRaw("歯医者 予約 15時", "schedule", new Date(now.getTime() - 60 * 60 * 1000).toISOString()),
@@ -153,12 +265,19 @@ function bindEvents() {
     });
   });
 
+  document.querySelectorAll("[data-language]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.ui.language = button.dataset.language;
+      persist();
+      render();
+    });
+  });
+
   sortSwitch.querySelectorAll("[data-sort]").forEach((button) => {
     button.addEventListener("click", () => {
       state.ui.sortMode = button.dataset.sort;
       persist();
-      renderSortButtons();
-      renderAllList();
+      render();
     });
   });
 
@@ -168,37 +287,11 @@ function bindEvents() {
   editForm.addEventListener("submit", handleEditSubmit);
 }
 
-function toggleFabMenu() {
-  state.ui.fabOpen = !state.ui.fabOpen;
-  persist();
-  renderFab();
-}
-
-function openView(viewName) {
-  state.ui.activeView = viewName;
-  state.ui.fabOpen = false;
-  clearStatuses();
-  persist();
-  render();
-
-  if (viewName === "schedule") scheduleRaw.focus();
-  if (viewName === "todo") todoRaw.focus();
-  if (viewName === "memo") memoRaw.focus();
-  if (viewName === "edit") editRaw.focus();
-}
-
-function clearStatuses() {
-  state.ui.scheduleStatus = "";
-  state.ui.todoStatus = "";
-  state.ui.memoStatus = "";
-  state.ui.editStatus = "";
-}
-
 function handleRawSubmit(event, field, fallbackKind, statusKey) {
   event.preventDefault();
   const rawText = field.value.trim();
   if (!rawText) {
-    state.ui[statusKey] = T.required;
+    state.ui[statusKey] = t("required");
     persist();
     renderStatuses();
     return;
@@ -206,7 +299,7 @@ function handleRawSubmit(event, field, fallbackKind, statusKey) {
 
   state.items.push(enrichItemFromRaw(rawText, fallbackKind, getCurrentNow().toISOString()));
   field.value = "";
-  state.ui[statusKey] = T.saved;
+  state.ui[statusKey] = t("saved");
   persist();
   openView("home");
 }
@@ -215,7 +308,7 @@ function handleEditSubmit(event) {
   event.preventDefault();
   const rawText = editRaw.value.trim();
   if (!rawText) {
-    state.ui.editStatus = T.required;
+    state.ui.editStatus = t("required");
     persist();
     renderStatuses();
     return;
@@ -229,7 +322,7 @@ function handleEditSubmit(event) {
   replaceItem(state.ui.editingItemId, rawText);
   state.ui.editingItemId = null;
   editRaw.value = "";
-  state.ui.editStatus = T.updated;
+  state.ui.editStatus = t("updated");
   persist();
   openView("all");
 }
@@ -238,13 +331,12 @@ function replaceItem(itemId, rawText) {
   state.items = state.items.map((item) => {
     if (item.id !== itemId) return item;
     const replacement = enrichItemFromRaw(rawText, item.kind, item.createdAt);
-    const scheduledChanged = item.scheduledAt !== replacement.scheduledAt;
     replacement.id = item.id;
     replacement.completedAt = item.completedAt || null;
     replacement.reactionScore = item.reactionScore || 0;
     replacement.prompt = item.prompt || buildPromptMeta();
     replacement.workStage = item.workStage || "unstarted";
-    replacement.previousScheduledAt = scheduledChanged ? item.scheduledAt || null : item.previousScheduledAt || null;
+    replacement.previousScheduledAt = item.scheduledAt !== replacement.scheduledAt ? item.scheduledAt || null : item.previousScheduledAt || null;
     return replacement;
   });
 }
@@ -276,19 +368,7 @@ function enrichItemFromRaw(rawText, fallbackKind, createdAt) {
 }
 
 function buildPromptMeta() {
-  return {
-    lastPromptedAt: null,
-    dismissCount: 0,
-  };
-}
-
-function syncCompletionModeFromLocation() {
-  const params = new URLSearchParams(window.location.search);
-  const mode = (params.get("complete") || "").toLowerCase();
-  if (mode === "trash" || mode === "archive") {
-    state.ui.completionMode = mode;
-    persist();
-  }
+  return { lastPromptedAt: null, dismissCount: 0 };
 }
 
 function parseRawText(rawText, fallbackKind) {
@@ -308,7 +388,6 @@ function parseRawText(rawText, fallbackKind) {
   const deadlineAt = buildDeadlineAt(kind, dayInfo);
   const prepStartAt = buildPrepStartAt(kind, scheduledAt, deadlineAt);
   const nextActionAt = buildNextActionAt(kind, scheduledAt, deadlineAt, prepStartAt);
-  const initialState = inferInitialState(kind, dayInfo, scheduledAt, deadlineAt);
 
   return {
     kind,
@@ -320,8 +399,8 @@ function parseRawText(rawText, fallbackKind) {
     deadlineAt,
     prepStartAt,
     nextActionAt,
-    initialState,
     ambiguity: dayInfo.ambiguity,
+    initialState: inferInitialState(kind, dayInfo, scheduledAt, deadlineAt),
     classification: kind === "memo" ? "memo" : kind === "schedule" ? "schedule" : kind === "todo" ? "todo" : "unknown",
   };
 }
@@ -333,25 +412,25 @@ function parseTimeToken(tokens) {
     const [hours, minutes] = token.split(":").map(Number);
     return { token, hours, minutes };
   }
-  const hours = Number(token.replace("時半", "").replace("時", ""));
-  const minutes = token.includes("半") ? 30 : 0;
-  return { token, hours, minutes };
+  return {
+    token,
+    hours: Number(token.replace("時半", "").replace("時", "")),
+    minutes: token.includes("半") ? 30 : 0,
+  };
 }
 
 function parseDateToken(tokens) {
   const now = getCurrentNow();
-  const explicitDateToken = tokens.find((value) => /^\d{1,2}\/\d{1,2}$/.test(value));
-  if (explicitDateToken) {
-    const [month, day] = explicitDateToken.split("/").map(Number);
-    const date = new Date(now.getFullYear(), month - 1, day);
-    return { token: explicitDateToken, date, certainty: "exact", ambiguity: null };
+  const explicitDate = tokens.find((value) => /^\d{1,2}\/\d{1,2}$/.test(value));
+  if (explicitDate) {
+    const [month, day] = explicitDate.split("/").map(Number);
+    return { token: explicitDate, date: new Date(now.getFullYear(), month - 1, day), certainty: "exact", ambiguity: null };
   }
 
   const token = tokens.find((value) =>
     ["今日", "明日", "来週金曜", "来週金曜日", "金", "金曜", "金曜日", "土", "土曜", "土曜日", "月", "月曜", "月曜日"].includes(value)
   );
   if (!token) return { token: "", date: null, certainty: "missing", ambiguity: null };
-
   if (token === "今日") return { token, date: stripTime(now), certainty: "exact", ambiguity: null };
   if (token === "明日") {
     const date = stripTime(now);
@@ -361,53 +440,37 @@ function parseDateToken(tokens) {
   if (token === "来週金曜" || token === "来週金曜日") {
     return { token, date: buildUpcomingWeekdayDate(5, true), certainty: "exact", ambiguity: null };
   }
-
-  return {
-    token,
-    date: null,
-    certainty: "ambiguous",
-    ambiguity: {
-      type: "weekday_only",
-      weekday: inferWeekdayFromToken(token),
-    },
-  };
+  return { token, date: null, certainty: "ambiguous", ambiguity: { type: "weekday_only", weekday: inferWeekdayFromToken(token) } };
 }
 
 function parseActionToken(tokens) {
   const actions = ["提出", "予約", "買い物", "準備", "確認", "展示"];
-  const token = tokens.find((value) => actions.includes(value)) || "";
-  return { token };
+  return { token: tokens.find((value) => actions.includes(value)) || "" };
 }
 
 function inferKind(fallbackKind, rawText, actionInfo, timeInfo, dayInfo, tokens) {
-  if (fallbackKind === "memo") {
-    const learned = inferKindFromUserLearning(tokens);
-    return learned || "memo";
-  }
+  if (fallbackKind === "memo") return inferKindFromLearning(tokens) || "memo";
   if (timeInfo.token || rawText.includes("予約")) return "schedule";
   if (dayInfo.token || actionInfo.token === "提出" || fallbackKind === "todo") return "todo";
-  const learned = inferKindFromUserLearning(tokens);
-  return learned || "unknown";
+  return inferKindFromLearning(tokens) || "unknown";
 }
 
-function inferKindFromUserLearning(tokens) {
-  const scores = { schedule: 0, todo: 0, memo: 0 };
+function inferKindFromLearning(tokens) {
+  const score = { schedule: 0, todo: 0, memo: 0 };
   tokens.forEach((token) => {
     const learned = state.userLearning.termKinds[token];
     if (!learned) return;
-    Object.keys(scores).forEach((kind) => {
-      scores[kind] += learned[kind] || 0;
+    Object.keys(score).forEach((kind) => {
+      score[kind] += learned[kind] || 0;
     });
   });
-  const winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
-  if (!winner || winner[1] <= 0) return null;
-  return winner[0];
+  const winner = Object.entries(score).sort((a, b) => b[1] - a[1])[0];
+  return winner && winner[1] > 0 ? winner[0] : null;
 }
 
 function buildTitle(titleToken, actionInfo, kind) {
   if (!titleToken) return "未分類";
-  if (kind === "todo" && actionInfo.token === "提出") return `${titleToken}提出`;
-  return titleToken;
+  return kind === "todo" && actionInfo.token === "提出" ? `${titleToken}提出` : titleToken;
 }
 
 function buildSupport(supportTokens, actionInfo) {
@@ -418,29 +481,22 @@ function buildSupport(supportTokens, actionInfo) {
 }
 
 function buildScheduledAt(kind, timeInfo, dayInfo) {
-  if (kind !== "schedule") return null;
-  if (timeInfo.hours === null) return null;
-  if (dayInfo.certainty !== "exact") return null;
+  if (kind !== "schedule" || timeInfo.hours === null || dayInfo.certainty !== "exact") return null;
   const date = new Date(dayInfo.date);
   date.setHours(timeInfo.hours, timeInfo.minutes ?? 0, 0, 0);
   return toTokyoIso(date);
 }
 
 function buildDeadlineAt(kind, dayInfo) {
-  if (kind !== "todo") return null;
-  if (dayInfo.certainty !== "exact") return null;
+  if (kind !== "todo" || dayInfo.certainty !== "exact") return null;
   const date = new Date(dayInfo.date);
   date.setHours(18, 0, 0, 0);
   return toTokyoIso(date);
 }
 
 function buildPrepStartAt(kind, scheduledAt, deadlineAt) {
-  if (kind === "schedule" && scheduledAt) {
-    return toTokyoIso(new Date(new Date(scheduledAt).getTime() - 45 * 60 * 1000));
-  }
-  if (kind === "todo" && deadlineAt) {
-    return toTokyoIso(new Date(new Date(deadlineAt).getTime() - 24 * 60 * 60 * 1000));
-  }
+  if (kind === "schedule" && scheduledAt) return toTokyoIso(new Date(new Date(scheduledAt).getTime() - 45 * 60 * 1000));
+  if (kind === "todo" && deadlineAt) return toTokyoIso(new Date(new Date(deadlineAt).getTime() - 24 * 60 * 60 * 1000));
   return null;
 }
 
@@ -455,18 +511,17 @@ function inferInitialState(kind, dayInfo, scheduledAt, deadlineAt) {
   if (dayInfo.certainty === "ambiguous" || (kind === "schedule" && (!dayInfo.token || !scheduledAt))) return STATES.DATE_UNCONFIRMED;
   if (kind === "todo" && dayInfo.certainty === "missing") return STATES.NEED_INFO;
   if (!scheduledAt && !deadlineAt) return STATES.NEED_INFO;
-  return deriveState(
-    { kind, scheduledAt, deadlineAt, prepStartAt: buildPrepStartAt(kind, scheduledAt, deadlineAt), completedAt: null, ambiguity: null },
-    getCurrentNow().getTime()
-  );
+  return deriveState({ kind, scheduledAt, deadlineAt, prepStartAt: buildPrepStartAt(kind, scheduledAt, deadlineAt), ambiguity: null, completedAt: null }, getCurrentNow().getTime());
 }
 
 function render() {
   refreshDynamicState();
+  applyStaticTranslations();
   renderDate();
   renderViews();
   renderHomeVariant();
   renderVariantChrome();
+  renderLanguageSwitch();
   renderFocusCards();
   renderNextCards();
   renderFab();
@@ -475,33 +530,18 @@ function render() {
   renderAllList();
 }
 
-function refreshDynamicState() {
-  const now = getCurrentNow().getTime();
-  state.items.forEach((item) => {
-    item.state = deriveState(item, now);
+function applyStaticTranslations() {
+  document.documentElement.lang = state.ui.language;
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    node.textContent = t(node.dataset.i18n);
   });
-  persist();
-}
-
-function deriveState(item, now) {
-  if (item.completedAt) return STATES.DONE;
-  if (item.kind === "memo" || item.kind === "unknown") return STATES.INBOX;
-  if (item.ambiguity || (item.kind === "schedule" && !item.scheduledAt)) return STATES.DATE_UNCONFIRMED;
-  if (item.kind === "todo" && !item.deadlineAt) return STATES.NEED_INFO;
-
-  const scheduled = item.scheduledAt ? new Date(item.scheduledAt).getTime() : null;
-  const deadline = item.deadlineAt ? new Date(item.deadlineAt).getTime() : null;
-  const prepStart = item.prepStartAt ? new Date(item.prepStartAt).getTime() : null;
-  const anchor = scheduled || deadline;
-
-  if (!anchor) return STATES.NEED_INFO;
-  if (anchor <= now) return STATES.PAST_UNCONFIRMED;
-  if (prepStart && prepStart <= now) return STATES.ACTION_NOW;
-  return STATES.UPCOMING;
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+    node.setAttribute("placeholder", t(node.dataset.i18nPlaceholder));
+  });
 }
 
 function renderDate() {
-  topDate.textContent = new Intl.DateTimeFormat("ja-JP", {
+  topDate.textContent = new Intl.DateTimeFormat(state.ui.language === "ja" ? "ja-JP" : "en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -536,6 +576,35 @@ function renderVariantChrome() {
   bodyRoot.dataset.homeVariant = state.ui.homeVariant;
 }
 
+function renderLanguageSwitch() {
+  document.querySelectorAll("[data-language]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.language === state.ui.language);
+  });
+}
+
+function refreshDynamicState() {
+  const now = getCurrentNow().getTime();
+  state.items.forEach((item) => {
+    item.state = deriveState(item, now);
+  });
+  persist();
+}
+
+function deriveState(item, now) {
+  if (item.completedAt) return STATES.DONE;
+  if (item.kind === "memo" || item.kind === "unknown") return STATES.INBOX;
+  if (item.ambiguity || (item.kind === "schedule" && !item.scheduledAt)) return STATES.DATE_UNCONFIRMED;
+  if (item.kind === "todo" && !item.deadlineAt) return STATES.NEED_INFO;
+  const scheduled = item.scheduledAt ? new Date(item.scheduledAt).getTime() : null;
+  const deadline = item.deadlineAt ? new Date(item.deadlineAt).getTime() : null;
+  const prepStart = item.prepStartAt ? new Date(item.prepStartAt).getTime() : null;
+  const anchor = scheduled || deadline;
+  if (!anchor) return STATES.NEED_INFO;
+  if (anchor <= now) return STATES.PAST_UNCONFIRMED;
+  if (prepStart && prepStart <= now) return STATES.ACTION_NOW;
+  return STATES.UPCOMING;
+}
+
 function renderFocusCards() {
   const focusItem = getFocusItem();
   renderFocusCardInto(focusCardA, focusTemplateA, focusItem, "A");
@@ -545,7 +614,7 @@ function renderFocusCards() {
 function renderFocusCardInto(container, template, item, variant) {
   container.innerHTML = "";
   if (!item) {
-    container.innerHTML = `<article class="focus-article"><p class="focus-time">${T.nowLabel}</p><h1 class="focus-title">${T.homeEmptyTitle}</h1><p class="focus-support">${T.homeEmptyMeta}</p></article>`;
+    container.innerHTML = `<article class="focus-article"><p class="focus-time">${t("nowLabel")}</p><h1 class="focus-title">${t("homeEmptyTitle")}</h1><p class="focus-support">${t("homeEmptyMeta")}</p></article>`;
     return;
   }
 
@@ -566,9 +635,9 @@ function renderFocusCardInto(container, template, item, variant) {
 }
 
 function buildFocusTitle(item) {
-  if (item.state === STATES.PAST_UNCONFIRMED) return `${item.title}\n${T.pastQuestion}`;
-  if (item.state === STATES.DATE_UNCONFIRMED) return `${item.title}\nいつの${formatWeekdayName(item.ambiguity && item.ambiguity.weekday)}ですか`;
-  if (item.state === STATES.INBOX) return `${item.title}\n予定ですか？`;
+  if (item.state === STATES.PAST_UNCONFIRMED) return `${item.title}\n${t("pastQuestion")}`;
+  if (item.state === STATES.DATE_UNCONFIRMED) return `${item.title}\n${t("dateQuestion", { weekday: formatWeekdayName(item.ambiguity && item.ambiguity.weekday) })}`;
+  if (item.state === STATES.INBOX) return `${item.title}\n${t("inboxQuestion")}`;
   return item.title;
 }
 
@@ -576,31 +645,28 @@ function buildFocusActions(item) {
   if (item.state === STATES.PAST_UNCONFIRMED) {
     markPrompted(item);
     return [
-      { label: "終える", kind: "primary", onClick: () => handleCompleteAction(item.id) },
-      { label: "あらためる", kind: "middle", onClick: () => sendToNeedInfo(item.id) },
-      { label: "時間を変える", kind: "subtle", onClick: () => beginReschedule(item.id) },
+      { label: t("doneAction"), kind: "primary", onClick: () => handleCompleteAction(item.id) },
+      { label: t("rescheduleAction"), kind: "middle", onClick: () => sendToNeedInfo(item.id) },
+      { label: t("changeTimeAction"), kind: "subtle", onClick: () => beginReschedule(item.id) },
     ];
   }
-
   if (item.state === STATES.DATE_UNCONFIRMED && item.ambiguity && item.ambiguity.type === "weekday_only") {
     const nextDate = buildUpcomingWeekdayDate(item.ambiguity.weekday, false);
     const followingDate = buildUpcomingWeekdayDate(item.ambiguity.weekday, true);
     return [
-      { label: formatRelativeChoice("次", nextDate), kind: "primary", onClick: () => confirmDateChoice(item.id, nextDate) },
-      { label: formatRelativeChoice("来週", followingDate), kind: "middle", onClick: () => confirmDateChoice(item.id, followingDate) },
-      { label: "書き直す", kind: "subtle", onClick: () => openEditView(item.id) },
+      { label: t("nextOption", { date: formatMonthDay(nextDate) }), kind: "primary", onClick: () => confirmDateChoice(item.id, nextDate) },
+      { label: t("followingOption", { date: formatMonthDay(followingDate) }), kind: "middle", onClick: () => confirmDateChoice(item.id, followingDate) },
+      { label: t("rewrite"), kind: "subtle", onClick: () => openEditView(item.id) },
     ];
   }
-
   if (item.state === STATES.INBOX) {
     markPrompted(item);
     return [
-      { label: "予定にする", kind: "primary", onClick: () => classifyInboxItem(item.id, "schedule") },
-      { label: "調べる", kind: "middle", onClick: () => classifyInboxItem(item.id, "todo") },
-      { label: "そのまま", kind: "subtle", onClick: () => dismissInboxItem(item.id) },
+      { label: t("makeSchedule"), kind: "primary", onClick: () => classifyInboxItem(item.id, "schedule") },
+      { label: t("research"), kind: "middle", onClick: () => classifyInboxItem(item.id, "todo") },
+      { label: t("keepAsIs"), kind: "subtle", onClick: () => dismissInboxItem(item.id) },
     ];
   }
-
   return [];
 }
 
@@ -614,7 +680,7 @@ function renderNextCardInto(container, item) {
   container.innerHTML = "";
   const fragment = nextTemplate.content.cloneNode(true);
   fragment.querySelector(".next-time").textContent = item ? displayPrimaryTime(item) : "";
-  fragment.querySelector(".next-title").textContent = item ? item.title : T.nextEmptyTitle;
+  fragment.querySelector(".next-title").textContent = item ? item.title : t("nextEmptyTitle");
   fragment.querySelector(".next-support").textContent = item ? displaySupport(item) : "";
   container.appendChild(fragment);
 }
@@ -640,10 +706,9 @@ function renderSortButtons() {
 function renderAllList() {
   allList.innerHTML = "";
   if (state.ui.activeView !== "all") return;
-
   const items = getAllItemsSorted();
   if (items.length === 0) {
-    allList.innerHTML = `<p class="all-empty">${T.allEmpty}</p>`;
+    allList.innerHTML = `<p class="all-empty">${t("allEmpty")}</p>`;
     return;
   }
 
@@ -654,8 +719,7 @@ function renderAllList() {
     fragment.querySelector(".all-time").textContent = displayPrimaryTime(item);
     fragment.querySelector(".all-title").textContent = item.title;
     fragment.querySelector(".all-support").textContent = displaySupport(item);
-    editButton.textContent = T.rewrite;
-
+    editButton.textContent = t("rewrite");
     article.tabIndex = 0;
     article.setAttribute("role", "button");
     article.addEventListener("click", () => openEditView(item.id));
@@ -673,20 +737,8 @@ function renderAllList() {
   });
 }
 
-function openEditView(itemId) {
-  const item = findItem(itemId);
-  if (!item) return;
-  state.ui.editingItemId = itemId;
-  state.ui.editStatus = "";
-  editRaw.value = item.rawText;
-  persist();
-  openView("edit");
-}
-
 function getFocusItem() {
-  return state.items
-    .filter((item) => item.state !== STATES.DONE)
-    .sort(compareByPriority)[0] || null;
+  return state.items.filter((item) => item.state !== STATES.DONE).sort(compareByPriority)[0] || null;
 }
 
 function getNextScheduleItem() {
@@ -703,8 +755,7 @@ function getAllItemsSorted() {
 
 function compareByPriority(left, right) {
   const scoreDiff = calculatePriorityScore(right) - calculatePriorityScore(left);
-  if (scoreDiff !== 0) return scoreDiff;
-  return compareByTime(left, right);
+  return scoreDiff !== 0 ? scoreDiff : compareByTime(left, right);
 }
 
 function compareByTime(left, right) {
@@ -724,7 +775,6 @@ function calculatePriorityScore(item) {
     [STATES.NEED_INFO]: 180,
     [STATES.DONE]: -999,
   };
-
   let score = stateWeight[item.state] || 0;
   const now = getCurrentNow().getTime();
   const anchor = getChronologicalValue(item);
@@ -748,23 +798,22 @@ function getChronologicalValue(item) {
 }
 
 function displayPrimaryTime(item) {
-  if (item.state === STATES.INBOX) return T.inboxLabel;
-  if (item.state === STATES.DATE_UNCONFIRMED) return T.dateUnconfirmedLabel;
-  if (item.state === STATES.NEED_INFO) return T.needsInfoLabel;
+  if (item.state === STATES.INBOX) return t("inboxLabel");
+  if (item.state === STATES.DATE_UNCONFIRMED) return t("dateUnconfirmedLabel");
+  if (item.state === STATES.NEED_INFO) return t("needsInfoLabel");
   if (item.scheduledAt) return formatScheduledDisplay(item.scheduledAt);
   if (item.deadlineAt) return formatScheduledDisplay(item.deadlineAt);
   if (item.nextActionAt) return formatScheduledDisplay(item.nextActionAt);
-  return T.nowLabel;
+  return t("nowLabel");
 }
 
 function displaySupport(item) {
   if (item.state === STATES.PAST_UNCONFIRMED) return item.support || item.rawText;
   if (item.state === STATES.INBOX) return item.support || item.rawText;
-  if (item.state === STATES.DATE_UNCONFIRMED) return "日付がまだ確定していません";
+  if (item.state === STATES.DATE_UNCONFIRMED) return t("dateUnconfirmedSupport");
   if (item.support) return item.support;
-  if (item.state === STATES.NEED_INFO) return "時間や期限を後で確認します";
-  if (item.kind === "memo" || item.kind === "unknown") return item.rawText;
-  return "";
+  if (item.state === STATES.NEED_INFO) return t("needInfoSupport");
+  return item.rawText || "";
 }
 
 function classifyInboxItem(itemId, nextKind) {
@@ -775,16 +824,12 @@ function classifyInboxItem(itemId, nextKind) {
   item.reactionScore += 12;
   item.prompt.dismissCount = 0;
   recordClassificationLearning(item, nextKind);
-
   if (nextKind === "schedule") {
     item.state = STATES.DATE_UNCONFIRMED;
     item.ambiguity = item.ambiguity || { type: "needs_date" };
   } else if (nextKind === "todo") {
     item.state = STATES.NEED_INFO;
-  } else {
-    item.state = STATES.INBOX;
   }
-
   persist();
   render();
 }
@@ -792,15 +837,14 @@ function classifyInboxItem(itemId, nextKind) {
 function dismissInboxItem(itemId) {
   const item = findItem(itemId);
   if (!item) return;
-  item.prompt.dismissCount = (item.prompt.dismissCount || 0) + 1;
+  item.prompt.dismissCount += 1;
   item.prompt.lastPromptedAt = getCurrentNow().toISOString();
   persist();
   render();
 }
 
 function recordClassificationLearning(item, selectedKind) {
-  const terms = item.tokens.filter((token) => token && token.length >= 2);
-  terms.forEach((term) => {
+  item.tokens.filter((token) => token && token.length >= 2).forEach((term) => {
     const current = state.userLearning.termKinds[term] || { schedule: 0, todo: 0, memo: 0 };
     current[selectedKind] = (current[selectedKind] || 0) + 1;
     state.userLearning.termKinds[term] = current;
@@ -816,7 +860,6 @@ function recordClassificationLearning(item, selectedKind) {
 function confirmDateChoice(itemId, date) {
   const item = findItem(itemId);
   if (!item) return;
-
   if (item.kind === "schedule") {
     const base = item.scheduledAt ? new Date(item.scheduledAt) : new Date(date);
     if (!item.scheduledAt) base.setHours(9, 0, 0, 0);
@@ -827,7 +870,6 @@ function confirmDateChoice(itemId, date) {
     deadline.setHours(18, 0, 0, 0);
     item.deadlineAt = toTokyoIso(deadline);
   }
-
   item.ambiguity = null;
   item.prepStartAt = buildPrepStartAt(item.kind, item.scheduledAt, item.deadlineAt);
   item.nextActionAt = buildNextActionAt(item.kind, item.scheduledAt, item.deadlineAt, item.prepStartAt);
@@ -836,13 +878,43 @@ function confirmDateChoice(itemId, date) {
   render();
 }
 
+function sendToNeedInfo(itemId) {
+  const item = findItem(itemId);
+  if (!item) return;
+  item.state = item.kind === "schedule" ? STATES.DATE_UNCONFIRMED : STATES.NEED_INFO;
+  item.deadlineAt = null;
+  item.scheduledAt = null;
+  item.prepStartAt = null;
+  item.nextActionAt = null;
+  item.prompt.dismissCount += 1;
+  persist();
+  render();
+}
+
+function beginReschedule(itemId) {
+  openEditView(itemId);
+  const item = findItem(itemId);
+  if (!item) return;
+  item.prompt.dismissCount += 1;
+  persist();
+}
+
+function openEditView(itemId) {
+  const item = findItem(itemId);
+  if (!item) return;
+  state.ui.editingItemId = itemId;
+  state.ui.editStatus = "";
+  editRaw.value = item.rawText;
+  persist();
+  openView("edit");
+}
+
 function handleCompleteAction(itemId) {
   if (state.ui.homeVariant !== "B") {
     markDone(itemId);
     return;
   }
-  const focusNode = document.querySelector("#focus-card-b .focus-article-b");
-  playCompletionAnimation(focusNode, () => markDone(itemId));
+  playCompletionAnimation(document.querySelector("#focus-card-b .focus-article-b"), () => markDone(itemId));
 }
 
 function markDone(itemId) {
@@ -855,11 +927,7 @@ function markDone(itemId) {
 }
 
 function playCompletionAnimation(targetNode, onComplete) {
-  if (!targetNode) {
-    onComplete();
-    return;
-  }
-
+  if (!targetNode) return onComplete();
   const icon = state.ui.completionMode === "trash" ? completionIconTrash : completionIconArchive;
   const otherIcon = state.ui.completionMode === "trash" ? completionIconArchive : completionIconTrash;
   otherIcon.classList.add("is-hidden");
@@ -867,7 +935,6 @@ function playCompletionAnimation(targetNode, onComplete) {
   completionSignal.classList.remove("is-hidden");
   completionSignal.classList.add("is-active");
   targetNode.classList.add("is-completing");
-
   window.setTimeout(() => {
     targetNode.classList.remove("is-completing");
     completionSignal.classList.remove("is-active");
@@ -877,27 +944,6 @@ function playCompletionAnimation(targetNode, onComplete) {
   }, 420);
 }
 
-function sendToNeedInfo(itemId) {
-  const item = findItem(itemId);
-  if (!item) return;
-  item.state = item.kind === "schedule" ? STATES.DATE_UNCONFIRMED : STATES.NEED_INFO;
-  item.deadlineAt = null;
-  item.scheduledAt = null;
-  item.prepStartAt = null;
-  item.nextActionAt = null;
-  item.prompt.dismissCount = (item.prompt.dismissCount || 0) + 1;
-  persist();
-  render();
-}
-
-function beginReschedule(itemId) {
-  openEditView(itemId);
-  const item = findItem(itemId);
-  if (!item) return;
-  item.prompt.dismissCount = (item.prompt.dismissCount || 0) + 1;
-  persist();
-}
-
 function markPrompted(item) {
   if (!shouldPromptItem(item)) return;
   item.prompt.lastPromptedAt = getCurrentNow().toISOString();
@@ -905,10 +951,35 @@ function markPrompted(item) {
 }
 
 function shouldPromptItem(item) {
-  const last = item.prompt && item.prompt.lastPromptedAt ? new Date(item.prompt.lastPromptedAt).getTime() : 0;
+  const last = item.prompt.lastPromptedAt ? new Date(item.prompt.lastPromptedAt).getTime() : 0;
   if (!last) return true;
   const interval = item.state === STATES.INBOX ? 24 * 60 * 60 * 1000 : 12 * 60 * 60 * 1000;
   return getCurrentNow().getTime() - last >= interval;
+}
+
+function toggleFabMenu() {
+  state.ui.fabOpen = !state.ui.fabOpen;
+  persist();
+  renderFab();
+}
+
+function openView(viewName) {
+  state.ui.activeView = viewName;
+  state.ui.fabOpen = false;
+  clearStatuses();
+  persist();
+  render();
+  if (viewName === "schedule") scheduleRaw.focus();
+  if (viewName === "todo") todoRaw.focus();
+  if (viewName === "memo") memoRaw.focus();
+  if (viewName === "edit") editRaw.focus();
+}
+
+function clearStatuses() {
+  state.ui.scheduleStatus = "";
+  state.ui.todoStatus = "";
+  state.ui.memoStatus = "";
+  state.ui.editStatus = "";
 }
 
 function findItem(itemId) {
@@ -918,27 +989,37 @@ function findItem(itemId) {
 function syncVariantFromLocation() {
   const params = new URLSearchParams(window.location.search);
   const variant = (params.get("variant") || "").toUpperCase();
-  if (variant === "A" || variant === "B") {
-    state.ui.homeVariant = variant;
-    persist();
-  }
+  if (variant === "A" || variant === "B") state.ui.homeVariant = variant;
+}
+
+function syncCompletionModeFromLocation() {
+  const params = new URLSearchParams(window.location.search);
+  const mode = (params.get("complete") || "").toLowerCase();
+  if (mode === "trash" || mode === "archive") state.ui.completionMode = mode;
 }
 
 function syncLocationFromVariant() {
   const params = new URLSearchParams(window.location.search);
   params.set("variant", state.ui.homeVariant.toLowerCase());
-  const nextUrl = `${window.location.pathname}?${params.toString()}`;
-  window.history.replaceState({}, "", nextUrl);
+  window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
 }
 
 function formatScheduledDisplay(value) {
   const date = new Date(value);
-  const weekday = new Intl.DateTimeFormat("ja-JP", { weekday: "short", timeZone: TOKYO_TIME_ZONE }).format(date);
+  const locale = state.ui.language === "ja" ? "ja-JP" : "en-US";
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: TOKYO_TIME_ZONE }).format(date);
   return `${pad(date.getMonth() + 1)}.${pad(date.getDate())} ${weekday}\n${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-function formatRelativeChoice(prefix, date) {
-  return `${prefix} ${pad(date.getMonth() + 1)}/${pad(date.getDate())}`;
+function formatMonthDay(date) {
+  return `${pad(date.getMonth() + 1)}/${pad(date.getDate())}`;
+}
+
+function formatWeekdayName(weekday) {
+  const ja = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+  const en = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const table = state.ui.language === "ja" ? ja : en;
+  return table[weekday ?? 5];
 }
 
 function inferWeekdayFromToken(token) {
@@ -949,14 +1030,8 @@ function inferWeekdayFromToken(token) {
   return 5;
 }
 
-function formatWeekdayName(weekday) {
-  const map = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
-  return map[weekday ?? 5];
-}
-
 function buildUpcomingWeekdayDate(weekday, followingWeek) {
-  const now = getCurrentNow();
-  const base = stripTime(now);
+  const base = stripTime(getCurrentNow());
   let diff = (weekday - base.getDay() + 7) % 7;
   if (diff === 0) diff = 7;
   if (followingWeek) diff += 7;

@@ -144,7 +144,8 @@ textarea {
 }
 
 .home-variant-switch,
-.sort-switch {
+.sort-switch,
+.language-switch {
   display: flex;
   gap: 4px;
   align-items: center;
@@ -163,6 +164,18 @@ textarea {
   flex-shrink: 0;
 }
 
+.language-switch {
+  border: none;
+  padding: 0;
+  background: transparent;
+  gap: 18px;
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
 .app-shell[data-home-variant="B"] .home-variant-switch {
   border: none;
   padding: 0;
@@ -171,6 +184,16 @@ textarea {
   align-self: start;
   margin-top: 4px;
   margin-right: 4px;
+}
+
+.app-shell[data-home-variant="B"] .language-switch {
+  position: fixed;
+  right: 22px;
+  top: 180px;
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  letter-spacing: 0.18em;
 }
 
 .app-shell[data-home-variant="B"] .variant-button {
@@ -189,6 +212,7 @@ textarea {
 
 .variant-button,
 .sort-button,
+.language-button,
 .primary-button,
 .subtle-link,
 .fab-menu-item,
@@ -201,16 +225,38 @@ textarea {
 }
 
 .variant-button,
-.sort-button {
+.sort-button,
+.language-button {
   min-width: 52px;
   padding: var(--space-2) var(--space-3);
   color: var(--color-muted);
 }
 
 .variant-button.is-active,
-.sort-button.is-active {
+.sort-button.is-active,
+.language-button.is-active {
   color: var(--color-text);
   border-bottom: 1px solid var(--color-text);
+}
+
+.language-button {
+  min-width: 0;
+  padding: 0;
+  letter-spacing: 0.18em;
+}
+
+.app-shell[data-home-variant="B"] .language-button {
+  min-width: 0;
+  padding: 0;
+  color: #8a8a8a;
+  border-bottom: 1px solid transparent;
+  letter-spacing: 0.18em;
+  font-size: 0.94rem;
+}
+
+.app-shell[data-home-variant="B"] .language-button.is-active {
+  color: #111111;
+  border-bottom-color: #111111;
 }
 
 .view-section {
@@ -1033,6 +1079,13 @@ textarea {
   .b-home-left-rail,
   .b-home-right-rail {
     display: none;
+  }
+
+  .app-shell[data-home-variant="B"] .language-switch {
+    position: static;
+    display: flex;
+    gap: 18px;
+    justify-self: end;
   }
 
   .b-home-main {

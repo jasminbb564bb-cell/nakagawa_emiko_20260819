@@ -16,6 +16,10 @@
         <button id="variant-a" class="variant-button" type="button" data-variant="A">A</button>
         <button id="variant-b" class="variant-button" type="button" data-variant="B">B</button>
       </div>
+      <div class="language-switch" aria-label="Language switch">
+        <button class="language-button" type="button" data-language="ja">JA</button>
+        <button class="language-button" type="button" data-language="en">EN</button>
+      </div>
     </header>
 
     <main class="layout">
@@ -24,25 +28,25 @@
           <section class="hero-intro hero-intro-standalone" aria-labelledby="hero-intro-heading">
             <p class="section-mark" id="hero-intro-heading">Quiet Todo</p>
             <div class="hero-intro-copy">
-              <p class="hero-intro-main">&#20170;&#24517;&#35201;&#12394;&#12371;&#12392;&#12384;&#12369;&#12434;&#12289;&#38745;&#12363;&#12395;&#35211;&#12427;&#12290;</p>
-              <p class="hero-intro-sub">&#24605;&#12356;&#12388;&#12356;&#12383;&#12425;&#38609;&#12395;&#20837;&#12428;&#12390;&#12289;&#35211;&#12427;&#12392;&#12365;&#12384;&#12369;&#25972;&#12360;&#12427;&#12290;</p>
+              <p class="hero-intro-main" data-i18n="heroMain">&#20170;&#24517;&#35201;&#12394;&#12371;&#12392;&#12384;&#12369;&#12434;&#12289;&#38745;&#12363;&#12395;&#35211;&#12427;&#12290;</p>
+              <p class="hero-intro-sub" data-i18n="heroSub">&#24605;&#12356;&#12388;&#12356;&#12383;&#12425;&#38609;&#12395;&#20837;&#12428;&#12390;&#12289;&#35211;&#12427;&#12392;&#12365;&#12384;&#12369;&#25972;&#12360;&#12427;&#12290;</p>
             </div>
           </section>
           <div class="spatial-frame home-flow">
             <div class="flow-main">
-              <p class="section-mark" id="home-heading-a">Now</p>
+              <p class="section-mark" id="home-heading-a" data-i18n="nowHeading">Now</p>
               <div id="focus-card-a" class="focus-card"></div>
             </div>
             <aside class="flow-side" aria-label="Home navigation">
               <nav class="side-rail">
-                <span class="side-rail-item is-current">home</span>
-                <span class="side-rail-item">all</span>
-                <span class="side-rail-item">input</span>
+                <span class="side-rail-item is-current" data-i18n="navHome">home</span>
+                <span class="side-rail-item" data-i18n="navAll">all</span>
+                <span class="side-rail-item" data-i18n="navInput">input</span>
               </nav>
             </aside>
           </div>
           <section class="next-block" aria-labelledby="next-heading-a">
-            <p class="section-mark" id="next-heading-a">Next</p>
+            <p class="section-mark" id="next-heading-a" data-i18n="nextHeading">Next</p>
             <div id="next-card-a" class="next-card"></div>
           </section>
         </section>
@@ -55,23 +59,23 @@
             </aside>
             <section class="b-home-main">
               <nav class="b-home-top-nav" aria-label="Home B navigation">
-                <span class="b-home-nav-item">home</span>
-                <span class="b-home-nav-item">all</span>
-                <span class="b-home-nav-item">input</span>
+                <span class="b-home-nav-item" data-i18n="navHome">home</span>
+                <span class="b-home-nav-item" data-i18n="navAll">all</span>
+                <span class="b-home-nav-item" data-i18n="navInput">input</span>
               </nav>
               <div class="b-home-focus-wrap">
                 <div id="focus-card-b" class="focus-card"></div>
               </div>
               <div class="b-home-next-wrap" aria-labelledby="home-heading-b">
-                <p class="section-mark" id="home-heading-b">Next</p>
+                <p class="section-mark" id="home-heading-b" data-i18n="nextHeading">Next</p>
                 <div id="next-card-b" class="next-card"></div>
               </div>
             </section>
             <aside class="b-home-right-rail">
               <div class="b-home-brand">H O M E</div>
               <div class="b-home-subrail">
-                <span>now</span>
-                <span>next</span>
+                <span data-i18n="navNowLower">now</span>
+                <span data-i18n="navNextLower">next</span>
               </div>
             </aside>
           </div>
@@ -80,14 +84,14 @@
 
       <section id="all-view" class="view-section is-hidden" aria-labelledby="all-heading">
         <div class="view-head">
-          <button id="back-from-all" class="subtle-link" type="button">&#25147;&#12427;</button>
+          <button id="back-from-all" class="subtle-link" type="button" data-i18n="back">&#25147;&#12427;</button>
         </div>
         <section class="all-stage">
           <div class="all-stage-head">
-            <p class="section-mark" id="all-heading">&#12377;&#12409;&#12390;&#12434;&#35211;&#12427;</p>
+            <p class="section-mark" id="all-heading" data-i18n="viewAll">&#12377;&#12409;&#12390;&#12434;&#35211;&#12427;</p>
             <div class="sort-switch" id="sort-switch" aria-label="&#20006;&#12403;&#26367;&#12360;">
-              <button class="sort-button" type="button" data-sort="priority">&#20778;&#20808;&#38918;</button>
-              <button class="sort-button" type="button" data-sort="time">&#26178;&#38291;&#38918;</button>
+              <button class="sort-button" type="button" data-sort="priority" data-i18n="sortPriority">&#20778;&#20808;&#38918;</button>
+              <button class="sort-button" type="button" data-sort="time" data-i18n="sortTime">&#26178;&#38291;&#38918;</button>
             </div>
           </div>
           <div id="all-list" class="all-list"></div>
@@ -96,79 +100,79 @@
 
       <section id="schedule-view" class="view-section is-hidden" aria-labelledby="schedule-heading">
         <div class="view-head">
-          <button id="back-from-schedule" class="subtle-link" type="button">&#25147;&#12427;</button>
+          <button id="back-from-schedule" class="subtle-link" type="button" data-i18n="back">&#25147;&#12427;</button>
         </div>
         <section class="entry-stage">
-          <p class="section-mark" id="schedule-heading">&#26032;&#12375;&#12356;&#20104;&#23450;</p>
+          <p class="section-mark" id="schedule-heading" data-i18n="newSchedule">&#26032;&#12375;&#12356;&#20104;&#23450;</p>
           <form id="schedule-form" class="entry-form">
             <div class="entry-copy">
-              <p class="entry-copy-main">&#24605;&#12356;&#12388;&#12356;&#12383;&#12414;&#12414;&#12289;&#12473;&#12506;&#12540;&#12473;&#12391;&#12290;</p>
-              <p class="entry-copy-sub">Leave it here. We&apos;ll sort it.</p>
+              <p class="entry-copy-main" data-i18n="entryMain">&#24605;&#12356;&#12388;&#12356;&#12383;&#12414;&#12414;&#12289;&#12473;&#12506;&#12540;&#12473;&#12391;&#12290;</p>
+              <p class="entry-copy-sub" data-i18n="entrySub">Leave it here. We&apos;ll sort it.</p>
             </div>
-            <label class="entry-label" for="schedule-raw">&#38609;&#12395;&#20837;&#21147;</label>
+            <label class="entry-label" for="schedule-raw" data-i18n="rawInput">&#38609;&#12395;&#20837;&#21147;</label>
             <textarea id="schedule-raw" class="entry-box" rows="6"
-              placeholder="&#27503;&#21307;&#32773; &#20104;&#32004; 15&#26178;"></textarea>
+              placeholder="&#27503;&#21307;&#32773; &#20104;&#32004; 15&#26178;" data-i18n-placeholder="schedulePlaceholder"></textarea>
             <p class="subtle-status" id="schedule-status"></p>
-            <button class="primary-button" type="submit">&#20445;&#23384;</button>
+            <button class="primary-button" type="submit" data-i18n="save">&#20445;&#23384;</button>
           </form>
         </section>
       </section>
 
       <section id="todo-view" class="view-section is-hidden" aria-labelledby="todo-heading">
         <div class="view-head">
-          <button id="back-from-todo" class="subtle-link" type="button">&#25147;&#12427;</button>
+          <button id="back-from-todo" class="subtle-link" type="button" data-i18n="back">&#25147;&#12427;</button>
         </div>
         <section class="entry-stage">
-          <p class="section-mark" id="todo-heading">&#12420;&#12427;&#12371;&#12392;&#12434;&#36861;&#21152;</p>
+          <p class="section-mark" id="todo-heading" data-i18n="addTodo">&#12420;&#12427;&#12371;&#12392;&#12434;&#36861;&#21152;</p>
           <form id="todo-form" class="entry-form">
             <div class="entry-copy">
-              <p class="entry-copy-main">&#24605;&#12356;&#12388;&#12356;&#12383;&#12414;&#12414;&#12289;&#12473;&#12506;&#12540;&#12473;&#12391;&#12290;</p>
-              <p class="entry-copy-sub">Leave it here. We&apos;ll sort it.</p>
+              <p class="entry-copy-main" data-i18n="entryMain">&#24605;&#12356;&#12388;&#12356;&#12383;&#12414;&#12414;&#12289;&#12473;&#12506;&#12540;&#12473;&#12391;&#12290;</p>
+              <p class="entry-copy-sub" data-i18n="entrySub">Leave it here. We&apos;ll sort it.</p>
             </div>
-            <label class="entry-label" for="todo-raw">&#38609;&#12395;&#20837;&#21147;</label>
+            <label class="entry-label" for="todo-raw" data-i18n="rawInput">&#38609;&#12395;&#20837;&#21147;</label>
             <textarea id="todo-raw" class="entry-box" rows="6"
-              placeholder="&#35506;&#38988; &#25552;&#20986; &#37329;&#26332; &#20808;&#29983;"></textarea>
+              placeholder="&#35506;&#38988; &#25552;&#20986; &#37329;&#26332; &#20808;&#29983;" data-i18n-placeholder="todoPlaceholder"></textarea>
             <p class="subtle-status" id="todo-status"></p>
-            <button class="primary-button" type="submit">&#20445;&#23384;</button>
+            <button class="primary-button" type="submit" data-i18n="save">&#20445;&#23384;</button>
           </form>
         </section>
       </section>
 
       <section id="memo-view" class="view-section is-hidden" aria-labelledby="memo-heading">
         <div class="view-head">
-          <button id="back-from-memo" class="subtle-link" type="button">&#25147;&#12427;</button>
+          <button id="back-from-memo" class="subtle-link" type="button" data-i18n="back">&#25147;&#12427;</button>
         </div>
         <section class="entry-stage">
-          <p class="section-mark" id="memo-heading">&#12513;&#12514;</p>
+          <p class="section-mark" id="memo-heading" data-i18n="memo">&#12513;&#12514;</p>
           <form id="memo-form" class="entry-form">
             <div class="entry-copy">
-              <p class="entry-copy-main">&#24605;&#12356;&#12388;&#12356;&#12383;&#12414;&#12414;&#12289;&#12473;&#12506;&#12540;&#12473;&#12391;&#12290;</p>
-              <p class="entry-copy-sub">Leave it here. We&apos;ll sort it.</p>
+              <p class="entry-copy-main" data-i18n="entryMain">&#24605;&#12356;&#12388;&#12356;&#12383;&#12414;&#12414;&#12289;&#12473;&#12506;&#12540;&#12473;&#12391;&#12290;</p>
+              <p class="entry-copy-sub" data-i18n="entrySub">Leave it here. We&apos;ll sort it.</p>
             </div>
-            <label class="entry-label" for="memo-raw">&#38609;&#12395;&#20837;&#21147;</label>
+            <label class="entry-label" for="memo-raw" data-i18n="rawInput">&#38609;&#12395;&#20837;&#21147;</label>
             <textarea id="memo-raw" class="entry-box" rows="6"
-              placeholder="&#38738;&#26862;&#30476;&#31435;&#32654;&#34899;&#39208; &#23637;&#31034;"></textarea>
+              placeholder="&#38738;&#26862;&#30476;&#31435;&#32654;&#34899;&#39208; &#23637;&#31034;" data-i18n-placeholder="memoPlaceholder"></textarea>
             <p class="subtle-status" id="memo-status"></p>
-            <button class="primary-button" type="submit">&#20445;&#23384;</button>
+            <button class="primary-button" type="submit" data-i18n="save">&#20445;&#23384;</button>
           </form>
         </section>
       </section>
 
       <section id="edit-view" class="view-section is-hidden" aria-labelledby="edit-heading">
         <div class="view-head">
-          <button id="back-from-edit" class="subtle-link" type="button">&#25147;&#12427;</button>
+          <button id="back-from-edit" class="subtle-link" type="button" data-i18n="back">&#25147;&#12427;</button>
         </div>
         <section class="entry-stage">
-          <p class="section-mark" id="edit-heading">&#26360;&#12365;&#30452;&#12377;</p>
+          <p class="section-mark" id="edit-heading" data-i18n="rewrite">&#26360;&#12365;&#30452;&#12377;</p>
           <form id="edit-form" class="entry-form">
             <div class="entry-copy">
-              <p class="entry-copy-main">&#20803;&#12398;&#20837;&#21147;&#25991;&#12434;&#12381;&#12398;&#12414;&#12414;&#26360;&#12365;&#30452;&#12375;&#12414;&#12377;&#12290;</p>
-              <p class="entry-copy-sub">Leave it here. We&apos;ll sort it again.</p>
+              <p class="entry-copy-main" data-i18n="editMain">&#20803;&#12398;&#20837;&#21147;&#25991;&#12434;&#12381;&#12398;&#12414;&#12414;&#26360;&#12365;&#30452;&#12375;&#12414;&#12377;&#12290;</p>
+              <p class="entry-copy-sub" data-i18n="editSub">Leave it here. We&apos;ll sort it again.</p>
             </div>
-            <label class="entry-label" for="edit-raw">&#20837;&#21147;&#25991;</label>
+            <label class="entry-label" for="edit-raw" data-i18n="inputText">&#20837;&#21147;&#25991;</label>
             <textarea id="edit-raw" class="entry-box" rows="6"></textarea>
             <p class="subtle-status" id="edit-status"></p>
-            <button class="primary-button" type="submit">&#20445;&#23384;</button>
+            <button class="primary-button" type="submit" data-i18n="save">&#20445;&#23384;</button>
           </form>
         </section>
       </section>
@@ -177,10 +181,10 @@
 
   <div class="fab-wrap">
     <div id="fab-menu" class="fab-menu is-hidden" role="menu" aria-label="&#36861;&#21152;&#12513;&#12491;&#12517;&#12540;">
-      <button class="fab-menu-item" type="button" data-open-view="schedule">&#26032;&#12375;&#12356;&#20104;&#23450;</button>
-      <button class="fab-menu-item" type="button" data-open-view="todo">&#12420;&#12427;&#12371;&#12392;&#12434;&#36861;&#21152;</button>
-      <button class="fab-menu-item" type="button" data-open-view="memo">&#12513;&#12514;</button>
-      <button class="fab-menu-item" type="button" data-open-view="all">&#12377;&#12409;&#12390;&#12434;&#35211;&#12427;</button>
+      <button class="fab-menu-item" type="button" data-open-view="schedule" data-i18n="newSchedule">&#26032;&#12375;&#12356;&#20104;&#23450;</button>
+      <button class="fab-menu-item" type="button" data-open-view="todo" data-i18n="addTodo">&#12420;&#12427;&#12371;&#12392;&#12434;&#36861;&#21152;</button>
+      <button class="fab-menu-item" type="button" data-open-view="memo" data-i18n="memo">&#12513;&#12514;</button>
+      <button class="fab-menu-item" type="button" data-open-view="all" data-i18n="viewAll">&#12377;&#12409;&#12390;&#12434;&#35211;&#12427;</button>
     </div>
     <button id="fab-button" class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu">+</button>
   </div>
@@ -232,7 +236,7 @@
       <p class="all-time"></p>
       <h2 class="all-title"></h2>
       <p class="all-support"></p>
-      <button class="all-edit-link" type="button">&#26360;&#12365;&#30452;&#12377;</button>
+      <button class="all-edit-link" type="button" data-i18n="rewrite">&#26360;&#12365;&#30452;&#12377;</button>
     </article>
   </template>
 

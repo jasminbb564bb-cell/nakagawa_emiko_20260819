@@ -154,10 +154,6 @@ textarea {
 }
 
 .home-variant-switch {
-  display: none;
-}
-
-.home-variant-switch.is-dev-visible {
   display: flex;
 }
 

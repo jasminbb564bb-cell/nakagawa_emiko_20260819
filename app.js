@@ -534,8 +534,6 @@ function renderVariantChrome() {
   appShell.dataset.homeVariant = state.ui.homeVariant;
   htmlRoot.dataset.homeVariant = state.ui.homeVariant;
   bodyRoot.dataset.homeVariant = state.ui.homeVariant;
-  const params = new URLSearchParams(window.location.search);
-  document.querySelector(".home-variant-switch").classList.toggle("is-dev-visible", params.get("ab") === "1");
 }
 
 function renderFocusCards() {

@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quiet Todo</title>
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
@@ -153,6 +153,25 @@
           </form>
         </section>
       </section>
+
+      <section id="edit-view" class="view-section is-hidden" aria-labelledby="edit-heading">
+        <div class="view-head">
+          <button id="back-from-edit" class="subtle-link" type="button">&#25147;&#12427;</button>
+        </div>
+        <section class="entry-stage">
+          <p class="section-mark" id="edit-heading">&#26360;&#12365;&#30452;&#12377;</p>
+          <form id="edit-form" class="entry-form">
+            <div class="entry-copy">
+              <p class="entry-copy-main">&#20803;&#12398;&#20837;&#21147;&#25991;&#12434;&#12381;&#12398;&#12414;&#12414;&#26360;&#12365;&#30452;&#12375;&#12414;&#12377;&#12290;</p>
+              <p class="entry-copy-sub">Leave it here. We&apos;ll sort it again.</p>
+            </div>
+            <label class="entry-label" for="edit-raw">&#20837;&#21147;&#25991;</label>
+            <textarea id="edit-raw" class="entry-box" rows="6"></textarea>
+            <p class="subtle-status" id="edit-status"></p>
+            <button class="primary-button" type="submit">&#20445;&#23384;</button>
+          </form>
+        </section>
+      </section>
     </main>
   </div>
 
@@ -166,11 +185,28 @@
     <button id="fab-button" class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu">+</button>
   </div>
 
+  <div id="completion-signal" class="completion-signal is-hidden" aria-hidden="true">
+    <svg id="completion-icon-trash" class="completion-icon is-hidden" viewBox="0 0 16 16">
+      <path d="M4 4.5H12"></path>
+      <path d="M5.2 4.5V13H10.8V4.5"></path>
+      <path d="M6.8 2.8H9.2"></path>
+      <path d="M7 6.3V11.1"></path>
+      <path d="M9 6.3V11.1"></path>
+    </svg>
+    <svg id="completion-icon-archive" class="completion-icon is-hidden" viewBox="0 0 16 16">
+      <path d="M3.5 4H12.5"></path>
+      <path d="M4.2 5.2H11.8V12.8H4.2Z"></path>
+      <path d="M6.3 8H9.7"></path>
+      <path d="M8 8V10.2"></path>
+    </svg>
+  </div>
+
   <template id="focus-template-a">
     <article class="focus-article focus-article-a">
       <p class="focus-time"></p>
       <h1 class="focus-title"></h1>
       <p class="focus-support"></p>
+      <div class="focus-actions"></div>
     </article>
   </template>
 
@@ -179,6 +215,7 @@
       <p class="focus-time"></p>
       <h1 class="focus-title"></h1>
       <p class="focus-support"></p>
+      <div class="focus-actions"></div>
     </article>
   </template>
 
@@ -195,10 +232,11 @@
       <p class="all-time"></p>
       <h2 class="all-title"></h2>
       <p class="all-support"></p>
+      <button class="all-edit-link" type="button">&#26360;&#12365;&#30452;&#12377;</button>
     </article>
   </template>
 
-  <script src="/app.js"></script>
+  <script src="./app.js"></script>
 </body>
 
 </html>

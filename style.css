@@ -472,6 +472,133 @@ textarea {
   margin-top: 3vh;
 }
 
+.focus-actions {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.focus-action {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.focus-action-a {
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+
+.focus-action-a:hover {
+  text-decoration: underline;
+}
+
+.app-shell[data-home-variant="B"] .focus-actions {
+  margin-top: 8vh;
+  gap: 28px;
+  justify-items: start;
+  padding-left: 7vw;
+}
+
+.app-shell[data-home-variant="B"] .focus-action {
+  color: #111111;
+  font-family: var(--font-family-base);
+  letter-spacing: 0.14em;
+  line-height: 1.9;
+}
+
+.app-shell[data-home-variant="B"] .focus-action-primary {
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.app-shell[data-home-variant="B"] .focus-action-middle {
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+.app-shell[data-home-variant="B"] .focus-action-subtle {
+  font-size: 0.82rem;
+  font-weight: 300;
+  color: #6f6f6f;
+}
+
+.app-shell[data-home-variant="B"] .focus-action:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  letter-spacing: 0.16em;
+}
+
+.app-shell[data-home-variant="B"] .focus-article-b {
+  transform-origin: left center;
+}
+
+.app-shell[data-home-variant="B"] .focus-article-b.is-completing {
+  animation: bCompleteFade 420ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.completion-signal {
+  position: fixed;
+  right: 26px;
+  bottom: 30px;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale(0.96);
+}
+
+.completion-signal.is-active {
+  animation: completionSignalIn 420ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.completion-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.completion-icon path {
+  fill: none;
+  stroke: #111111;
+  stroke-width: 1;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+}
+
+@keyframes bCompleteFade {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  65% {
+    opacity: 0.72;
+    transform: translate3d(48px, 18px, 0) scale(0.965);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(92px, 34px, 0) scale(0.92);
+  }
+}
+
+@keyframes completionSignalIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.96);
+  }
+  35% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 0.78;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 .focus-support,
 .next-time,
 .next-title {
@@ -578,10 +705,28 @@ textarea {
   gap: 12px;
   padding: 24px 0;
   border-top: 1px solid var(--color-line);
+  cursor: pointer;
+}
+
+.all-edit-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--color-muted);
+  padding: 0;
+  justify-self: start;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.all-edit-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .app-shell[data-home-variant="B"] .all-item {
-  grid-template-columns: 120px 120px minmax(0, 1fr);
+  grid-template-columns: 120px 120px minmax(0, 1fr) auto;
   gap: 12px 34px;
   align-items: start;
   padding: 26px 0 42px;
@@ -604,6 +749,23 @@ textarea {
 .app-shell[data-home-variant="B"] .all-title,
 .app-shell[data-home-variant="B"] .all-support {
   grid-column: 3;
+}
+
+.app-shell[data-home-variant="B"] .all-edit-link {
+  grid-column: 4;
+  grid-row: 2;
+  align-self: start;
+  justify-self: end;
+  font-family: var(--font-family-base);
+  font-size: 0.8rem;
+  font-weight: 300;
+  letter-spacing: 0.16em;
+  color: #6f6f6f;
+}
+
+.app-shell[data-home-variant="B"] .all-edit-link:hover {
+  color: #111111;
+  letter-spacing: 0.18em;
 }
 
 .app-shell[data-home-variant="B"] .all-time {
@@ -675,6 +837,10 @@ textarea {
   gap: 30px;
   backdrop-filter: none;
   padding-left: 10vw;
+}
+
+.app-shell[data-home-variant="B"] #edit-form {
+  max-width: 820px;
 }
 
 .entry-copy {
@@ -917,7 +1083,8 @@ textarea {
   }
 
   .app-shell[data-home-variant="B"] .all-title,
-  .app-shell[data-home-variant="B"] .all-support {
+  .app-shell[data-home-variant="B"] .all-support,
+  .app-shell[data-home-variant="B"] .all-edit-link {
     grid-column: auto;
   }
 

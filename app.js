@@ -328,6 +328,26 @@ function normalizeStoredItem(item) {
     };
   }
 
+  if (item.kind === "schedule" && parsedAsSchedule.scheduledAt) {
+    return {
+      ...item,
+      title: parsedAsSchedule.title,
+      support: parsedAsSchedule.support,
+      action: parsedAsSchedule.action,
+      tokens: parsedAsSchedule.tokens,
+      scheduledAt: item.scheduledAt || parsedAsSchedule.scheduledAt,
+      deadlineAt: null,
+      prepStartAt: buildPrepStartAt("schedule", item.scheduledAt || parsedAsSchedule.scheduledAt, null),
+      nextActionAt: buildNextActionAt(
+        "schedule",
+        item.scheduledAt || parsedAsSchedule.scheduledAt,
+        null,
+        buildPrepStartAt("schedule", item.scheduledAt || parsedAsSchedule.scheduledAt, null)
+      ),
+      ambiguity: parsedAsSchedule.ambiguity,
+    };
+  }
+
   return item;
 }
 
@@ -1073,13 +1093,35 @@ function displayPrimaryTime(item) {
 function displaySupport(item) {
   if (item.state === STATES.PAST_UNCONFIRMED) {
     const pastLine = state.ui.language === "ja" ? "予定時刻を過ぎています" : "The scheduled time has passed.";
-    return [pastLine, item.support || ""].filter(Boolean).join("\n");
+    return [pastLine, localizeGeneratedText(item.support || "")].filter(Boolean).join("\n");
   }
   if (item.state === STATES.INBOX) return item.support || item.rawText;
   if (item.state === STATES.DATE_UNCONFIRMED) return t("dateUnconfirmedSupport");
-  if (item.support) return item.support;
+  if (item.support) return localizeGeneratedText(item.support);
   if (item.state === STATES.NEED_INFO) return t("needInfoSupport");
   return item.rawText || "";
+}
+
+function localizeGeneratedText(text) {
+  if (!text || state.ui.language === "ja") return text;
+
+  return text
+    .replace(/本日|今日|きょう/g, "Today")
+    .replace(/明日|あした/g, "Tomorrow")
+    .replace(/明後日|あさって/g, "Day after tomorrow")
+    .replace(/今週(日曜日|日曜|日|月曜日|月曜|月|火曜日|火曜|火|水曜日|水曜|水|木曜日|木曜|木|金曜日|金曜|金|土曜日|土曜|土)/g, (_match, weekday) => `This ${weekdayToEnglish(weekday)}`)
+    .replace(/来週(日曜日|日曜|日|月曜日|月曜|月|火曜日|火曜|火|水曜日|水曜|水|木曜日|木曜|木|金曜日|金曜|金|土曜日|土曜|土)/g, (_match, weekday) => `Next ${weekdayToEnglish(weekday)}`);
+}
+
+function weekdayToEnglish(token) {
+  if (["日", "日曜", "日曜日"].includes(token)) return "Sunday";
+  if (["月", "月曜", "月曜日"].includes(token)) return "Monday";
+  if (["火", "火曜", "火曜日"].includes(token)) return "Tuesday";
+  if (["水", "水曜", "水曜日"].includes(token)) return "Wednesday";
+  if (["木", "木曜", "木曜日"].includes(token)) return "Thursday";
+  if (["金", "金曜", "金曜日"].includes(token)) return "Friday";
+  if (["土", "土曜", "土曜日"].includes(token)) return "Saturday";
+  return token;
 }
 
 function classifyInboxItem(itemId, nextKind) {
